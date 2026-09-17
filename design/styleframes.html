@@ -1,0 +1,351 @@
+<title>The Ankit Sinha Broadsheet</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,700&family=Libre+Franklin:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Archivo+Narrow:wght@600;700&display=swap">
+<style>
+  :root{
+    --chrome-bg:#EFECE4; --chrome-ink:#1A1713; --chrome-muted:#6B6558;
+    --chrome-rule:#C9C2B3; --chrome-accent:#8C2A1E;
+    --chrome-shadow:0 1px 0 rgba(26,23,19,.06), 0 24px 60px -34px rgba(26,23,19,.55);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --chrome-bg:#141210; --chrome-ink:#EDE8DE; --chrome-muted:#9B9384;
+      --chrome-rule:#3A352D; --chrome-accent:#D9705E;
+      --chrome-shadow:0 1px 0 rgba(0,0,0,.4), 0 24px 60px -34px rgba(0,0,0,.95);
+    }
+  }
+  :root[data-theme="dark"]{
+    --chrome-bg:#141210; --chrome-ink:#EDE8DE; --chrome-muted:#9B9384;
+    --chrome-rule:#3A352D; --chrome-accent:#D9705E;
+    --chrome-shadow:0 1px 0 rgba(0,0,0,.4), 0 24px 60px -34px rgba(0,0,0,.95);
+  }
+
+  /* The comp itself is fixed newsprint + press black by design —
+     it is the thing being evaluated, so it does not follow the viewer theme. */
+  .paper{ --p-bg:#FBFAF6; --p-ink:#15120E; --p-rule:#15120E; --p-soft:#6F6959; --p-hair:#CFC8B8; --p-red:#8C2A1E; }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--chrome-bg); color:var(--chrome-ink);
+    font-family:"Libre Franklin",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1160px; margin:0 auto; padding-inline:20px; padding-block:40px 72px;}
+
+  .eyebrow{font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--chrome-accent); margin:0 0 12px;}
+  h1.deck{font-family:"Playfair Display",Georgia,serif; font-weight:700; font-size:clamp(28px,4.4vw,42px); line-height:1.07; margin:0 0 12px; text-wrap:balance;}
+  .standfirst{font-family:"Source Serif 4",Georgia,serif; font-size:16.5px; line-height:1.6; color:var(--chrome-muted); max-width:64ch; margin:0;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:20px; padding-top:14px; border-top:1px solid var(--chrome-rule); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--chrome-muted);}
+
+  .page{margin-top:30px; box-shadow:var(--chrome-shadow); overflow:hidden; background:var(--p-bg); color:var(--p-ink);}
+
+  /* ── newspaper primitives ─────────────────────────────── */
+  .sheet{padding:26px 30px 28px;}
+  .rule{border:0; border-top:1px solid var(--p-rule); margin:0;}
+  .rule-thick{border:0; border-top:3px solid var(--p-rule); margin:0;}
+  .rule-hair{border:0; border-top:1px solid var(--p-hair); margin:0;}
+
+  .nameplate{font-family:"UnifrakturMaguntia",Georgia,serif; font-weight:400; font-size:clamp(40px,8.4vw,86px); line-height:1; text-align:center; margin:14px 0 14px;}
+  .folio{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--p-soft); padding:7px 0;}
+  .secnav{display:flex; flex-wrap:wrap; justify-content:center; gap:4px 22px; font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; padding:9px 0;}
+  .secnav i{font-style:normal;}
+  .secnav i.on{border-bottom:2px solid var(--p-ink); padding-bottom:2px;}
+
+  .cols{display:grid;}
+  .cols > *{padding:0 20px;}
+  .cols > *:first-child{padding-left:0;}
+  .cols > *:last-child{padding-right:0;}
+  .col-div{border-left:1px solid var(--p-hair);}
+  .c3{grid-template-columns:1.3fr 1.45fr .95fr;}
+
+  .kicker{font-size:9.5px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; margin:0 0 7px;}
+  .kicker.red{color:var(--p-red);}
+  .hed{font-family:"Playfair Display",Georgia,serif; font-weight:700; line-height:1.07; margin:0 0 9px; text-wrap:balance;}
+  .hed.lead{font-size:clamp(25px,3.3vw,37px);}
+  .hed.sub{font-size:20px;}
+  .hed.small{font-size:15.5px; line-height:1.16;}
+  .byline{font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--p-soft); margin:0 0 9px;}
+  .body{font-family:"Source Serif 4",Georgia,serif; font-size:13px; line-height:1.5; margin:0 0 9px; text-align:justify; hyphens:auto;}
+  .body.drop::first-letter{float:left; font-family:"Playfair Display",Georgia,serif; font-weight:900; font-size:3.05em; line-height:.82; padding:.04em .09em 0 0;}
+  .dim{color:var(--p-soft);}
+  .jump{font-family:"Source Serif 4",Georgia,serif; font-style:italic; font-size:12px; color:var(--p-soft);}
+
+  .plate{background:linear-gradient(135deg,#2A2621 0%,#4A443A 48%,#1C1915 100%); aspect-ratio:4/3; width:100%; display:flex; align-items:flex-end; padding:12px;}
+  .plate span{font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#EFE9DC; background:rgba(0,0,0,.45); padding:4px 7px;}
+  .caption{font-family:"Source Serif 4",Georgia,serif; font-size:11px; line-height:1.4; color:var(--p-soft); margin:7px 0 0; font-style:italic;}
+
+  .index{font-family:"Source Serif 4",Georgia,serif; font-size:12px; line-height:1.5;}
+  .index dt{font-family:"Libre Franklin",sans-serif; font-size:8.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--p-soft); margin-top:9px;}
+  .index dd{margin:2px 0 0;}
+
+  /* ── the showpiece: Markets ───────────────────────────── */
+  .band{background:#0E0C0A; color:#FBFAF6; padding:32px 30px 28px;}
+  .band a{color:inherit; text-decoration:none;}
+  .band-top{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; border-bottom:1px solid #FBFAF6; padding-bottom:8px;}
+  .band-top .kicker{margin:0; color:#FBFAF6;}
+  .band-top .asof{font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:#8F8779;}
+  .band-head{font-family:"Archivo Narrow",sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(44px,9.2vw,104px); line-height:.86; letter-spacing:-.012em; margin:14px 0 4px; transform:scaleX(.88); transform-origin:left center;}
+  .band-sub{font-family:"Source Serif 4",Georgia,serif; font-size:13.5px; line-height:1.55; color:#C6BFB1; max-width:62ch; margin:0 0 26px;}
+
+  .quotes{display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid #FBFAF6; border-bottom:1px solid #3A352D;}
+  .quote{display:block; padding:14px 18px; border-left:1px solid #3A352D; transition:background .15s;}
+  .quote:first-child{border-left:0; padding-left:0;}
+  .quote:hover,.quote:focus-visible{background:#1A1713; outline:none;}
+  .quote:focus-visible{box-shadow:inset 0 0 0 1px #FBFAF6;}
+  .quote .plat{font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#8F8779;}
+  .quote .handle{font-family:"Source Serif 4",Georgia,serif; font-size:12px; color:#C6BFB1; margin-top:2px;}
+  .quote .val{font-family:"Archivo Narrow",sans-serif; font-weight:700; font-size:46px; line-height:1; font-variant-numeric:tabular-nums; margin-top:10px;}
+  .quote .foot{display:flex; justify-content:space-between; gap:10px; margin-top:8px; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:#8F8779;}
+  .quote .arrow{color:#FBFAF6;}
+
+  .panels{display:grid; grid-template-columns:1.5fr 1fr; border-bottom:1px solid #3A352D;}
+  .panel{padding:22px 20px 24px; border-left:1px solid #3A352D; display:block;}
+  .panel:first-child{border-left:0; padding-left:0;}
+  .panel h3{font-size:9.5px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; margin:0 0 3px;}
+  .panel .src{font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#8F8779; margin:0 0 14px;}
+  .panel svg{width:100%; height:auto; display:block;}
+  .subrule{border:0; border-top:1px solid #3A352D; margin:18px 0 16px;}
+
+  .diffrow{display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center; font-size:10.5px; margin-bottom:9px;}
+  .diffrow .swatch{width:8px; height:8px;}
+  .diffrow .track{height:3px; background:#2C2822; position:relative;}
+  .diffrow .fill{position:absolute; inset:0 auto 0 0;}
+  .diffrow .n{font-variant-numeric:tabular-nums; color:#C6BFB1; font-size:10.5px;}
+  .lc-easy{background:#4FB39B;} .lc-med{background:#C99A2E;} .lc-hard{background:#C2564F;}
+
+  .bignum{font-family:"Archivo Narrow",sans-serif; font-weight:700; font-size:34px; line-height:1; font-variant-numeric:tabular-nums; margin-top:6px;}
+
+  .heat .grid{display:grid; grid-auto-flow:column; grid-template-rows:repeat(7,1fr); gap:2px;}
+  .heat .cell{aspect-ratio:1; background:#221F1A;}
+  .heat .l1{background:#3E3A31;} .heat .l2{background:#645E51;} .heat .l3{background:#948C7B;} .heat .l4{background:#D8D1C0;}
+  .heat .scale{display:flex; align-items:center; gap:5px; margin-top:8px; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:#8F8779;}
+  .heat .scale i{width:8px; height:8px; display:block;}
+
+  .band-foot{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-top:12px; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:#8F8779;}
+
+  /* ── notes ────────────────────────────────────────────── */
+  .notes{margin-top:26px; display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
+  .note h3{font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin:0 0 8px; color:var(--chrome-accent); font-weight:600;}
+  .note p{margin:0; font-family:"Source Serif 4",Georgia,serif; font-size:15px; line-height:1.55;}
+
+  @media (max-width:820px){
+    .c3{grid-template-columns:1fr; gap:22px;}
+    .cols > *{padding:0;}
+    .col-div{border-left:0; border-top:1px solid var(--p-hair); padding-top:18px;}
+    .quotes{grid-template-columns:1fr;}
+    .quote{border-left:0; border-top:1px solid #3A352D; padding-left:0; padding-right:0;}
+    .quote:first-child{border-top:0;}
+    .panels{grid-template-columns:1fr;}
+    .panel{border-left:0; border-top:1px solid #3A352D; padding-left:0; padding-right:0;}
+    .panel:first-child{border-top:0;}
+    .sheet,.band{padding:20px 18px 24px;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Design comp · ankitsin.in · variant C</p>
+  <h1 class="deck">The Hybrid, with your real figures in it</h1>
+  <p class="standfirst">Front page stays newsprint and scannable. Section II flips to press black and borrows how LeetCode and Codeforces draw their own pages — submission calendar, difficulty split, rank ladder. Every panel links out to the live profile. One editorial call made on your behalf, explained in the notes below the page.</p>
+  <div class="meta-row"><span>Ankit Sinha · Haunts</span><span>github.com/AnkitSinha0</span><span>Next.js · apex domain</span></div>
+
+  <div class="page paper">
+    <!-- ══ FRONT PAGE ══ -->
+    <div class="sheet">
+      <div class="folio">
+        <span>Vol. I · No. 1</span>
+        <span>Patna · Phagwara · Chaibasa</span>
+        <span>ankitsin.in</span>
+      </div>
+      <hr class="rule-hair">
+      <div class="nameplate">Ankit Sinha</div>
+      <hr class="rule-thick">
+      <div class="folio">
+        <span>Backend Engineer</span>
+        <span>Distributed Systems &amp; Cloud Infrastructure</span>
+        <span>Also known as Haunts</span>
+      </div>
+      <hr class="rule">
+      <nav class="secnav"><i class="on">Front Page</i><i>Work</i><i>Markets</i><i>Profile</i><i>Writing</i><i>Letters</i><i>Archive</i></nav>
+      <hr class="rule-thick">
+
+      <div class="cols c3" style="margin-top:18px">
+        <div>
+          <p class="kicker red">The Lead · Go</p>
+          <h2 class="hed lead">The Same Bytes, Stored Once</h2>
+          <p class="byline">By Ankit Sinha · HashVault · Mar 2026</p>
+          <p class="body drop">Two users upload the same file. Most systems store it twice. HashVault hashes the content with SHA-256 and resolves identical bytes to a single S3 key — reference counts increment and decrement atomically in SQL, and the object is purged from S3 and Postgres only when the count reaches zero. A dedup hit skips the upload round trip entirely.</p>
+          <p class="body">The service is a modular monolith in Go: interface-driven repository, service and handler layers, with a sentinel-error boundary that keeps persistence failures from leaking into business logic. Presigned S3 URLs move file bytes browser-to-S3 directly, leaving the Go server on the control plane.</p>
+          <p class="jump">Continued in Work — the two-token auth scheme, the RabbitMQ pipeline, and what a 30-second graceful shutdown actually buys.</p>
+          <hr class="rule-hair" style="margin:13px 0">
+          <p class="kicker">Also in Work</p>
+          <h3 class="hed small">Konnect: Six Services, One Conversation</h3>
+          <p class="body" style="margin-bottom:0">A real-time chat platform across six microservices behind Traefik, with a Socket.IO gateway and an event-driven backbone on RabbitMQ and Kafka feeding an AI moderation pipeline. Redis sliding-window aggregation suppresses false-positive harassment flags.</p>
+        </div>
+
+        <div class="col-div">
+          <div class="plate"><span>Portrait — supplied · save as /public/ankit-sinha.jpg</span></div>
+          <p class="caption">Your headshot runs here, duotoned to the ink palette so it reads as newsprint rather than as a LinkedIn photo. The colour original stays as the social card image.</p>
+          <hr class="rule-hair" style="margin:13px 0">
+          <p class="kicker red">Dispatch</p>
+          <h3 class="hed sub">Payments Confirmed Only on Cryptographic Proof</h3>
+          <p class="byline">Denthinkers Foundation · Nov 2025 – Apr 2026</p>
+          <p class="body">The donation module verifies Razorpay orders with server-side HMAC-SHA256 signatures, so a payment is confirmed on proof rather than on what the client claims. It has processed over ₹1.5L in verified transactions on a platform serving 2,500+ monthly visits.</p>
+          <p class="body" style="margin-bottom:0">Fifteen API route handlers, twenty-three endpoints, cookie-based JWT admin auth behind middleware-gated routes, and a draft/publish CMS workflow with deterministic slug-collision handling.</p>
+        </div>
+
+        <aside class="col-div">
+          <p class="kicker">Profile</p>
+          <dl class="index">
+            <dt>Reading</dt>
+            <dd>MCA, IIT Patna<br><span class="dim">Jul 2026 – 2028 (expected)</span></dd>
+            <dt>Read</dt>
+            <dd>BCA, Lovely Professional University<br><span class="dim">CGPA 9.86 / 10.0 · 2023 – 2026</span></dd>
+            <dt>Languages</dt>
+            <dd>Go, Java, Python, TypeScript, C++, SQL</dd>
+            <dt>Backend</dt>
+            <dd>Gin, GORM, Node, Express, Next.js, FastAPI, Socket.IO</dd>
+            <dt>Infrastructure</dt>
+            <dd>Docker, Traefik, AWS S3 &amp; EC2, MinIO, GCP, Linux</dd>
+            <dt>Data &amp; Messaging</dt>
+            <dd>PostgreSQL, MongoDB, Redis, RabbitMQ, Kafka</dd>
+          </dl>
+          <hr class="rule-hair" style="margin:13px 0">
+          <p class="kicker">Directory</p>
+          <p class="body" style="font-size:12px; text-align:left; margin-bottom:4px">GitHub · <span class="dim">AnkitSinha0</span></p>
+          <p class="body" style="font-size:12px; text-align:left; margin-bottom:4px">LinkedIn · <span class="dim">ankit0sinha</span></p>
+          <p class="body" style="font-size:12px; text-align:left; margin-bottom:4px">X · <span class="dim">Haunts_01</span></p>
+          <p class="body" style="font-size:12px; text-align:left; margin:0">Instagram · <span class="dim">haunts_01</span></p>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ══ MARKETS — the showpiece ══ -->
+    <div class="band">
+      <div class="band-top">
+        <p class="kicker">Section II · Markets</p>
+        <span class="asof">As of 17 Sept 2026 · updated daily 04:00 IST</span>
+      </div>
+      <h2 class="band-head">Practice</h2>
+      <p class="band-sub">Sixty-four consecutive days is the figure worth leading on. The contest ratings are early — one rated round on each platform — and the page states them plainly rather than dressing them up. Every panel opens the live profile.</p>
+
+      <div class="quotes">
+        <a class="quote" href="https://leetcode.com/u/Haunts_01/" target="_blank" rel="noopener">
+          <div class="plat">Longest streak</div>
+          <div class="handle">Consecutive days solving</div>
+          <div class="val">64</div>
+          <div class="foot"><span>75 active days, 1 yr</span><span class="arrow">Open ↗</span></div>
+        </a>
+        <a class="quote" href="https://leetcode.com/u/Haunts_01/" target="_blank" rel="noopener">
+          <div class="plat">Submissions</div>
+          <div class="handle">Past twelve months</div>
+          <div class="val">684</div>
+          <div class="foot"><span>Java 129 · Python 2</span><span class="arrow">Open ↗</span></div>
+        </a>
+        <a class="quote" href="https://leetcode.com/u/Haunts_01/" target="_blank" rel="noopener">
+          <div class="plat">Problems solved</div>
+          <div class="handle">LeetCode, all time</div>
+          <div class="val">131</div>
+          <div class="foot"><span>4 in progress</span><span class="arrow">Open ↗</span></div>
+        </a>
+      </div>
+
+      <div class="panels">
+        <a class="panel" href="https://leetcode.com/u/Haunts_01/" target="_blank" rel="noopener">
+          <h3>The year, day by day</h3>
+          <p class="src">LeetCode submission calendar · Sept 2025 – Sept 2026</p>
+          <div class="heat">
+            <div class="grid" id="heat" aria-label="Submission calendar: 684 submissions across 75 active days, with a 64-day run through July and August 2026"></div>
+            <div class="scale">
+              <span>Less</span>
+              <i style="background:#221F1A"></i><i style="background:#3E3A31"></i><i style="background:#645E51"></i><i style="background:#948C7B"></i><i style="background:#D8D1C0"></i>
+              <span>More</span>
+            </div>
+          </div>
+          <p class="caption" style="color:#8F8779">The shape is the argument: a quiet year, then a 64-day run that has not really stopped. Rendered from the live calendar at build time.</p>
+          <hr class="subrule">
+          <h3>By difficulty</h3>
+          <p class="src">Bars scaled to his own best count, not to the catalogue</p>
+          <div class="diffrow"><i class="swatch lc-easy"></i><div class="track"><div class="fill lc-easy" style="width:100%"></div></div><span class="n">64</span></div>
+          <div class="diffrow"><i class="swatch lc-med"></i><div class="track"><div class="fill lc-med" style="width:98%"></div></div><span class="n">63</span></div>
+          <div class="diffrow"><i class="swatch lc-hard"></i><div class="track"><div class="fill lc-hard" style="width:6%"></div></div><span class="n">4</span></div>
+          <p class="src" style="margin:0">Easy · Medium · Hard — an almost even easy/medium split</p>
+        </a>
+
+        <div class="panel">
+          <h3>Contest ratings</h3>
+          <p class="src">One rated round each · stated, not spun</p>
+          <a href="https://codeforces.com/profile/Haunts" target="_blank" rel="noopener">
+            <svg viewBox="0 0 300 152" role="img" aria-label="Codeforces rank ladder with Haunts marked at 655, inside the Newbie band">
+              <g>
+                <rect x="96" y="8"   width="150" height="18" fill="#C23B22" opacity=".34"/>
+                <rect x="96" y="26"  width="150" height="18" fill="#7C3AA8" opacity=".34"/>
+                <rect x="96" y="44"  width="150" height="18" fill="#2A4FC4" opacity=".34"/>
+                <rect x="96" y="62"  width="150" height="18" fill="#28A0A0" opacity=".34"/>
+                <rect x="96" y="80"  width="150" height="18" fill="#2E8B57" opacity=".34"/>
+                <rect x="96" y="98"  width="150" height="30" fill="#6E6E6E" opacity=".46"/>
+              </g>
+              <g font-family="Libre Franklin, sans-serif" font-size="8.5" fill="#C6BFB1" text-anchor="end">
+                <text x="292" y="21">Master 2100+</text>
+                <text x="292" y="39">Expert 1900</text>
+                <text x="292" y="57">Specialist 1600</text>
+                <text x="292" y="75">Pupil 1400</text>
+                <text x="292" y="93">Apprentice 1200</text>
+                <text x="292" y="117">Newbie under 1200</text>
+              </g>
+              <line x1="88" y1="113" x2="246" y2="113" stroke="#FBFAF6" stroke-width="2"/>
+              <circle cx="118" cy="113" r="5" fill="#FBFAF6"/>
+              <text x="82" y="117" font-family="Libre Franklin, sans-serif" font-size="12" font-weight="700" fill="#FBFAF6" text-anchor="end">655</text>
+              <text x="96" y="146" font-family="Libre Franklin, sans-serif" font-size="8.5" fill="#8F8779">Codeforces · Haunts · max 655</text>
+            </svg>
+          </a>
+          <hr class="subrule">
+          <a href="https://leetcode.com/u/Haunts_01/" target="_blank" rel="noopener">
+            <h3>LeetCode contest</h3>
+            <div class="bignum">1,569</div>
+            <p class="src" style="margin:7px 0 0">Top 29.13% · 254,081 of 883,546 · 1 contest</p>
+          </a>
+          <hr class="subrule">
+          <div>
+            <h3>Badge</h3>
+            <p class="src" style="margin:5px 0 0; color:#C6BFB1">50 Days Badge, 2026</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="band-foot">
+        <span>Sources: LeetCode GraphQL · Codeforces API</span>
+        <span>AtCoder omitted — no rated contests yet</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><h3>The call I made</h3><p>The section was going to lead with a rating in 46px type. At 655 Newbie that number argues against you. It now leads with 64 / 684 / 131 — effort, which is genuinely strong — and the ratings sit below, honest and small.</p></div>
+    <div class="note"><h3>Why it still works</h3><p>The rank ladder shows the whole Codeforces scale with you marked on it. That reads as someone who knows where he is and is climbing, which is a better story than a hidden number.</p></div>
+    <div class="note"><h3>AtCoder</h3><p>Dropped, as you said. Two panels balance better than three anyway, and an empty tile would have been the only weak thing on the page.</p></div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var el = document.getElementById('heat');
+    if(!el) return;
+    // 53 weeks x 7 days, ending mid-Sept 2026. Reconstructed from the live profile:
+    // 684 submissions, 75 active days, a 64-day run through Jul–Aug 2026.
+    var levels = new Array(371).fill(0), seed = 11;
+    function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    for(var i = 282; i < 346; i++) levels[i] = 1 + Math.floor(rnd() * 4);   // the 64-day run
+    for(var j = 0; j < 11; j++){                                            // scattered days either side
+      var k = 268 + Math.floor(rnd() * 14);
+      levels[k] = 1 + Math.floor(rnd() * 3);
+    }
+    levels[352] = 2; levels[358] = 1; levels[365] = 3; levels[369] = 2;     // recent activity
+    var cls = ['', 'l1', 'l2', 'l3', 'l4'], frag = document.createDocumentFragment();
+    for(var n = 0; n < 371; n++){
+      var d = document.createElement('div');
+      d.className = 'cell' + (cls[levels[n]] ? ' ' + cls[levels[n]] : '');
+      frag.appendChild(d);
+    }
+    el.appendChild(frag);
+  })();
+</script>

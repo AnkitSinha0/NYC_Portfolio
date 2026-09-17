@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
+/*
+  Newsprint is a deliberate single-world design, the way a letterpress
+  invitation is — the paper ground and press-black Markets inversion are
+  the identity, not a light theme to be swapped for dark. No
+  prefers-color-scheme branch on purpose. See CLAUDE.md.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #15120e;
+  --paper: #fbfaf6;
+  --soft: #6f6959;
+  --hair: #cfc8b8;
+  --rule: #15120e;
+  --red: #8c2a1e;
+
+  --press-bg: #0e0c0a;
+  --press-ink: #fbfaf6;
+  --press-soft: #8f8779;
+  --press-hair: #3a352d;
+
+  --font-nameplate: "UnifrakturMaguntia", Georgia, serif;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Source Serif 4", Georgia, serif;
+  --font-utility: "Libre Franklin", -apple-system, "Segoe UI", sans-serif;
+  --font-condensed: "Archivo Narrow", "Playfair Display", sans-serif;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-soft: var(--soft);
+  --color-hair: var(--hair);
+  --color-rule: var(--rule);
+  --color-red: var(--red);
+  --color-press-bg: var(--press-bg);
+  --color-press-ink: var(--press-ink);
+  --color-press-soft: var(--press-soft);
+  --color-press-hair: var(--press-hair);
+
+  --font-nameplate: var(--font-nameplate);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-utility: var(--font-utility);
+  --font-condensed: var(--font-condensed);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-utility);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
