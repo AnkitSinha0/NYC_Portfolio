@@ -96,6 +96,7 @@
 html {
   color-scheme: light;
   scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
 }
 body {
   margin: 0;
@@ -141,17 +142,18 @@ body {
   pointer-events: none;
   z-index: 5;
   opacity: var(--crease);
-  mix-blend-mode: soft-light;
+  mix-blend-mode: overlay;
   background:
-    linear-gradient(91deg, transparent 24.4%, rgba(255, 255, 255, 0.3) 24.8%, rgba(0, 0, 0, 0.07) 25.2%, transparent 25.7%),
-    linear-gradient(89.4deg, transparent 49.3%, rgba(255, 255, 255, 0.26) 49.8%, rgba(0, 0, 0, 0.08) 50.2%, transparent 50.8%),
-    linear-gradient(90.6deg, transparent 74.4%, rgba(255, 255, 255, 0.22) 74.8%, rgba(0, 0, 0, 0.06) 75.2%, transparent 75.7%),
-    linear-gradient(179deg, transparent 32.5%, rgba(255, 255, 255, 0.22) 33%, rgba(0, 0, 0, 0.07) 33.4%, transparent 34%),
-    linear-gradient(181deg, transparent 66.5%, rgba(255, 255, 255, 0.2) 67%, rgba(0, 0, 0, 0.06) 67.4%, transparent 68%),
-    radial-gradient(ellipse 34% 22% at 18% 26%, rgba(255, 255, 255, 0.16), transparent 70%),
-    radial-gradient(ellipse 26% 30% at 72% 58%, rgba(0, 0, 0, 0.055), transparent 70%),
-    radial-gradient(ellipse 30% 20% at 88% 14%, rgba(255, 255, 255, 0.12), transparent 70%),
-    radial-gradient(ellipse 24% 26% at 34% 82%, rgba(0, 0, 0, 0.05), transparent 70%);
+    linear-gradient(91deg, transparent 24.2%, rgba(255, 255, 255, 0.55) 24.7%, rgba(0, 0, 0, 0.16) 25.2%, transparent 25.8%),
+    linear-gradient(89.4deg, transparent 49.1%, rgba(255, 255, 255, 0.5) 49.7%, rgba(0, 0, 0, 0.18) 50.2%, transparent 50.9%),
+    linear-gradient(90.6deg, transparent 74.2%, rgba(255, 255, 255, 0.42) 74.7%, rgba(0, 0, 0, 0.14) 75.2%, transparent 75.8%),
+    linear-gradient(179deg, transparent 32.3%, rgba(255, 255, 255, 0.42) 32.9%, rgba(0, 0, 0, 0.16) 33.4%, transparent 34.1%),
+    linear-gradient(181deg, transparent 66.3%, rgba(255, 255, 255, 0.38) 66.9%, rgba(0, 0, 0, 0.14) 67.4%, transparent 68.1%),
+    radial-gradient(ellipse 34% 22% at 18% 26%, rgba(255, 255, 255, 0.3), transparent 70%),
+    radial-gradient(ellipse 26% 30% at 72% 58%, rgba(0, 0, 0, 0.12), transparent 70%),
+    radial-gradient(ellipse 30% 20% at 88% 14%, rgba(255, 255, 255, 0.24), transparent 70%),
+    radial-gradient(ellipse 24% 26% at 34% 82%, rgba(0, 0, 0, 0.1), transparent 70%),
+    radial-gradient(ellipse 46% 30% at 4% 8%, rgba(0, 0, 0, 0.14), transparent 72%);
 }
 .stain::before {
   content: "";
@@ -339,6 +341,11 @@ body {
 .band {
   position: relative;
   padding: clamp(22px, 3vw, 44px) clamp(16px, 3vw, 54px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  scroll-snap-align: start;
 }
 .band.cream {
   background: var(--paper);
@@ -1374,6 +1381,11 @@ table.laps td:first-child {
   }
   .aside-scribble {
     display: none;
+  }
+  .plate-meta {
+    justify-content: center;
+    text-align: center;
+    margin-top: 4px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
