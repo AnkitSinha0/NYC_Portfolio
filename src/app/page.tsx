@@ -47,7 +47,12 @@ export default function FrontPage() {
           </div>
 
           <div>
-            <Plate alt="Portrait — pending" caption="Duotoned portrait, once supplied and saved to /public/ankit-sinha.jpg. The colour original stays as the social-card image." />
+            <Plate
+              src="/ankit-sinha.png"
+              alt="Portrait of Ankit Sinha"
+              caption="Ankit Sinha. The colour original serves as the social-card image; this duotone runs on the page."
+              duotone
+            />
 
             <Rule weight="hairline" className="my-4" />
 

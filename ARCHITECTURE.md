@@ -163,7 +163,7 @@ The mechanism that makes Google link "Ankit Sinha" / "Haunts" to your profiles i
     { "@type": "CollegeOrUniversity", "name": "Lovely Professional University" }
   ],
   "knowsAbout": ["Go", "Distributed Systems", "Cloud Infrastructure", "PostgreSQL", "Redis", "RabbitMQ", "Kafka", "AWS S3"],
-  "image": "https://ankitsin.in/ankit-sinha.jpg",
+  "image": "https://ankitsin.in/ankit-sinha.png",
   "sameAs": [
     "https://www.linkedin.com/in/ankit0sinha/",
     "https://x.com/Haunts_01",
@@ -211,7 +211,7 @@ Ship after step 4. Everything after that is additive, and a live site starts acc
 
 - [x] ~~CV~~ — received; facts in §1a
 - [x] ~~Styleframe choice~~ — variant C
-- [x] ~~Portrait~~ — supplied; save to `public/ankit-sinha.jpg`, duotone to the ink palette for the centre column, keep the colour original for OG cards
+- [x] ~~Portrait~~ — supplied; save to `public/ankit-sinha.png`, duotone to the ink palette for the centre column, keep the colour original for OG cards
 - [x] ~~Ratings and solved counts~~ — in §1a
 - [x] ~~AtCoder~~ — dropped
 - [ ] Whether `/writing` ships at launch or stays hidden until there are two posts
