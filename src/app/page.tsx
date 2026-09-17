@@ -1,134 +1,322 @@
-import { PageHeader } from "@/components/PageHeader";
-import { Rule } from "@/components/Rule";
-import { Kicker } from "@/components/Kicker";
-import { Article } from "@/components/Article";
-import { Plate } from "@/components/Plate";
-import { ColumnGrid } from "@/components/ColumnGrid";
+import Image from "next/image";
+import { Rail } from "@/components/times/Rail";
+import { Darkroom } from "@/components/times/Darkroom";
+import { Projects } from "@/components/times/Projects";
+import { Terminal } from "@/components/times/Terminal";
+import { Markets } from "@/components/times/Markets";
 
-export default function FrontPage() {
+const LAPS: [number, string, number][] = [
+  [1, "Learning", 42],
+  [2, "Building", 38],
+  [3, "Exploring", 27],
+  [4, "Overthinking", 21],
+  [5, "Sleeping", 12],
+];
+
+const POLAROIDS: [string, string][] = [
+  ["Mountains", "high ground"],
+  ["Desk, 2am", "build hours"],
+  ["Camera", "35mm"],
+  ["Sketch", "a thought"],
+  ["Road", "somewhere"],
+];
+
+export default function Home() {
   return (
-    <main className="mx-auto max-w-[1180px] w-full px-5 py-7 bg-paper text-ink">
-      <PageHeader active="/" />
+    <div className="shell">
+      <Rail />
 
-      <div className="mt-5">
-        <ColumnGrid columns={3}>
-          <div>
-            <Article kicker="The Lead · Go" kickerAccent hed="The Same Bytes, Stored Once" hedSize="lead" byline="By Ankit Sinha · HashVault · Mar 2026" drop>
-              <p>
-                Two users upload the same file. Most systems store it twice. HashVault hashes the
-                content with SHA-256 and resolves identical bytes to a single S3 key — reference
-                counts increment and decrement atomically in SQL, and the object is purged from S3
-                and Postgres only when the count reaches zero. A dedup hit skips the upload round
-                trip entirely.
+      <main className="stage">
+        {/* ══ 01 FRONT PAGE ══ */}
+        <section className="band cream tex stain" id="s1">
+          <div className="topbar">
+            <span>A Developer&rsquo;s Log</span>
+            <nav>
+              <a href="#s3">Work</a>
+              <a href="#s7">Notes</a>
+              <a href="#s7">Photos</a>
+              <a href="#s2">About</a>
+              <a href="#s8">Contact</a>
+            </nav>
+            <span>Patna, India</span>
+          </div>
+          <hr className="rule-hair" />
+          <h1 className="plate-name">The Ankit Times</h1>
+          <div className="plate-meta">
+            Vol. I, No. 1
+            <br />
+            Sep 18, 2026
+          </div>
+          <hr className="rule-thick" />
+
+          <div className="front">
+            <div>
+              <p className="kick">Technology / People / Ideas</p>
+              <h1>Building Things for a More Open Internet.</h1>
+              <p className="by">By Ankit Sinha · Software Engineer</p>
+              <p className="lede">
+                From distributed systems to random side projects, I like understanding how things
+                work and then building them slightly differently.
               </p>
-              <p>
-                The service is a modular monolith in Go: interface-driven repository, service and
-                handler layers, with a sentinel-error boundary that keeps persistence failures from
-                leaking into business logic. Presigned S3 URLs move file bytes browser-to-S3
-                directly, leaving the Go server on the control plane.
+            </div>
+
+            <div className="portrait-wrap">
+              <div className="photo">
+                <Image
+                  src="/ankit-sinha.png"
+                  alt="Ankit Sinha"
+                  fill
+                  sizes="(max-width: 860px) 100vw, 40vw"
+                  priority
+                />
+              </div>
+              <p className="scribble">
+                Just a guy
+                <br />
+                who likes
+                <br />
+                building things
+                <br />— Ankit
               </p>
-            </Article>
-            <p className="font-body italic text-[12px] text-soft mt-1">
-              Continued in Work — the two-token auth scheme, the RabbitMQ pipeline, and what a
-              30-second graceful shutdown actually buys.
+            </div>
+
+            <div className="edition-col">
+              <div className="edition">
+                <h4>In This Edition</h4>
+                <ol>
+                  <li>
+                    <b>01</b>About
+                  </li>
+                  <li>
+                    <b>02</b>Projects
+                  </li>
+                  <li>
+                    <b>03</b>Terminal
+                  </li>
+                  <li>
+                    <b>04</b>F1
+                  </li>
+                  <li>
+                    <b>05</b>Markets
+                  </li>
+                  <li>
+                    <b>06</b>Contact
+                  </li>
+                </ol>
+              </div>
+              <p className="pullquote">
+                “Same Bytes,
+                <br />
+                Stored Once.”
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ 02 ABOUT ══ */}
+        <section className="band night" id="s2">
+          <p className="scroll-note">
+            {"// Scroll"}
+            <br />
+            to know more
+          </p>
+          <div className="about">
+            <Darkroom />
+            <div>
+              <h2>
+                Hi, I&rsquo;m <b>Ankit Sinha.</b>
+              </h2>
+              <p className="role">Backend engineer. Builder. Learner.</p>
+              <p className="bio">
+                Currently interested in distributed systems, cloud infrastructure and making
+                software that survives contact with production.
+              </p>
+              <div className="tags">
+                <span>F1</span>
+                <span>Photography</span>
+                <span>Mountains</span>
+                <span>Gaming</span>
+                <span>Drawing</span>
+              </div>
+            </div>
+          </div>
+          <p className="aside-scribble">
+            Same person,
+            <br />
+            more pixels.
+          </p>
+        </section>
+
+        {/* ══ 03 PROJECTS ══ */}
+        <Projects />
+
+        {/* ══ 04 TERMINAL ══ */}
+        <Terminal />
+
+        {/* ══ 05 F1 ══ */}
+        <section className="band f1" id="s5">
+          <div className="f1-blur" aria-hidden="true" />
+          <div className="f1-grid">
+            <div>
+              <h2>
+                Life is
+                <br />
+                a Race.
+              </h2>
+              <p className="disc">
+                Same discipline.
+                <br />
+                Different track.
+              </p>
+              <span className="strat">Strategy &gt; Speed</span>
+            </div>
+
+            <table className="laps">
+              <caption>2026 Season (Personal)</caption>
+              <thead>
+                <tr>
+                  <th />
+                  <th>Discipline</th>
+                  <th>Laps</th>
+                </tr>
+              </thead>
+              <tbody>
+                {LAPS.map(([pos, name, laps]) => (
+                  <tr key={name}>
+                    <td>{pos}</td>
+                    <td>{name}</td>
+                    <td>{laps}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="track">
+              <p className="quote">
+                “It&rsquo;s not just a sport.
+                <br />
+                It&rsquo;s a mindset.”
+              </p>
+              <svg viewBox="0 0 150 110" role="img" aria-label="Circuit outline">
+                <path
+                  d="M28,96 C14,88 12,70 24,58 C36,46 52,50 58,38 C64,26 56,14 70,10 C86,6 96,18 108,20 C124,22 136,34 132,50 C128,66 108,64 100,74 C92,84 96,98 82,102 C66,106 44,104 28,96 Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  opacity=".85"
+                />
+                <circle cx="28" cy="96" r="3.4" fill="var(--red-hot)" />
+              </svg>
+              <p className="lap">
+                <span>Monaco</span>
+                <b>Lap 1 →</b>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ 06 MARKETS ══ */}
+        <Markets />
+
+        {/* ══ 07 NOTES ══ */}
+        <section className="band cream notes tex stain" id="s7">
+          <div className="board">
+            <div className="pola">
+              <div className="photo">
+                <span className="lbl">{POLAROIDS[0][0]}</span>
+              </div>
+              <span className="cap">{POLAROIDS[0][1]}</span>
+            </div>
+            <div className="pola">
+              <div className="photo">
+                <span className="lbl">{POLAROIDS[1][0]}</span>
+              </div>
+              <span className="cap">{POLAROIDS[1][1]}</span>
+            </div>
+            <p className="note-scrib">
+              Mountains
+              <br />
+              make more sense
+              <br />
+              than people.
             </p>
-
-            <Rule weight="hairline" className="my-4" />
-
-            <Kicker>Also in Work</Kicker>
-            <Article hed="Konnect: Six Services, One Conversation" hedSize="small">
-              <p>
-                A real-time chat platform across six microservices behind Traefik, with a Socket.IO
-                gateway and an event-driven backbone on RabbitMQ and Kafka feeding an AI moderation
-                pipeline. Redis sliding-window aggregation suppresses false-positive harassment
-                flags.
-              </p>
-            </Article>
+            <div className="pola">
+              <div className="photo">
+                <span className="lbl">{POLAROIDS[2][0]}</span>
+              </div>
+              <span className="cap">{POLAROIDS[2][1]}</span>
+            </div>
+            <div className="pola">
+              <div className="photo">
+                <span className="lbl">{POLAROIDS[3][0]}</span>
+              </div>
+              <span className="cap">{POLAROIDS[3][1]}</span>
+            </div>
+            <p className="note-scrib">
+              Random shots.
+              <br />
+              Random thoughts.
+              <br />
+              Same person.
+            </p>
+            <div className="pola">
+              <div className="photo">
+                <span className="lbl">{POLAROIDS[4][0]}</span>
+              </div>
+              <span className="cap">{POLAROIDS[4][1]}</span>
+            </div>
           </div>
+        </section>
 
-          <div>
-            <Plate
-              src="/ankit-sinha.png"
-              alt="Portrait of Ankit Sinha"
-              caption="Ankit Sinha. The colour original serves as the social-card image; this duotone runs on the page."
-              duotone
-            />
-
-            <Rule weight="hairline" className="my-4" />
-
-            <Kicker accent>Dispatch</Kicker>
-            <Article hed="Payments Confirmed Only on Cryptographic Proof" hedSize="sub" byline="Denthinkers Foundation · Nov 2025 – Apr 2026">
-              <p>
-                The donation module verifies Razorpay orders with server-side HMAC-SHA256
-                signatures, so a payment is confirmed on proof rather than on what the client
-                claims. It has processed over ₹1.5L in verified transactions on a platform serving
-                2,500+ monthly visits.
-              </p>
-              <p>
-                Fifteen API route handlers, twenty-three endpoints, cookie-based JWT admin auth
-                behind middleware-gated routes, and a draft/publish CMS workflow with deterministic
-                slug-collision handling.
-              </p>
-            </Article>
-          </div>
-
-          <aside>
-            <Kicker>Profile</Kicker>
-            <dl className="font-body text-[12px] leading-[1.5]">
-              <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-2">
-                Reading
-              </dt>
-              <dd className="mt-0.5">
-                MCA, IIT Patna
+        {/* ══ 08 CONTACT ══ */}
+        <section className="band cream tex stain" id="s8">
+          <div className="contact">
+            <div>
+              <h2>
+                Let&rsquo;s Build
                 <br />
-                <span className="text-soft">Jul 2026 – 2028 (expected)</span>
-              </dd>
-              <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-2">
-                Read
-              </dt>
-              <dd className="mt-0.5">
-                BCA, Lovely Professional University
-                <br />
-                <span className="text-soft">CGPA 9.86 / 10.0 · 2023 – 2026</span>
-              </dd>
-              <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-2">
-                Languages
-              </dt>
-              <dd className="mt-0.5">Go, Java, Python, TypeScript, C++, SQL</dd>
-              <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-2">
-                Backend
-              </dt>
-              <dd className="mt-0.5">Gin, GORM, Node, Express, Next.js, FastAPI, Socket.IO</dd>
-              <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-2">
-                Infrastructure
-              </dt>
-              <dd className="mt-0.5">Docker, Traefik, AWS S3 &amp; EC2, MinIO, GCP, Linux</dd>
-              <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-2">
-                Data &amp; Messaging
-              </dt>
-              <dd className="mt-0.5">PostgreSQL, MongoDB, Redis, RabbitMQ, Kafka</dd>
-            </dl>
-
-            <Rule weight="hairline" className="my-4" />
-
-            <Kicker>Directory</Kicker>
-            <ul className="font-body text-[12px] list-none p-0 m-0 space-y-1">
+                Something Interesting.
+              </h2>
+              <p>Open to opportunities, collaborations, or just a good conversation.</p>
+            </div>
+            <ul className="links">
               <li>
-                GitHub · <span className="text-soft">AnkitSinha0</span>
+                <a href="https://github.com/AnkitSinha0" target="_blank" rel="noopener noreferrer">
+                  GitHub
+                </a>
               </li>
               <li>
-                LinkedIn · <span className="text-soft">ankit0sinha</span>
+                <a href="https://www.linkedin.com/in/ankit0sinha/" target="_blank" rel="noopener noreferrer">
+                  LinkedIn
+                </a>
               </li>
               <li>
-                X · <span className="text-soft">Haunts_01</span>
+                <a href="https://x.com/Haunts_01" target="_blank" rel="noopener noreferrer">
+                  X (Twitter)
+                </a>
               </li>
               <li>
-                Instagram · <span className="text-soft">haunts_01</span>
+                <a href="https://www.instagram.com/haunts_01/" target="_blank" rel="noopener noreferrer">
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a href="mailto:ankits0057@gmail.com">Email</a>
               </li>
             </ul>
-          </aside>
-        </ColumnGrid>
-      </div>
-    </main>
+            <div className="stamp-wrap">
+              <div className="stamp">
+                PATNA
+                <br />
+                INDIA
+                <br />
+                2026
+              </div>
+              <span className="sig">Ankit Sinha</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

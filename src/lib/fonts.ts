@@ -4,6 +4,8 @@ import {
   Source_Serif_4,
   Libre_Franklin,
   Archivo_Narrow,
+  JetBrains_Mono,
+  Caveat,
 } from "next/font/google";
 
 // Nameplate — the wordmark only. Never body text.
@@ -28,18 +30,34 @@ export const body = Source_Serif_4({
   display: "swap",
 });
 
-// Kickers, bylines, folio, nav, labels — all-caps utility face
+// Kickers, bylines, folio, nav, labels
 export const utility = Libre_Franklin({
   subsets: ["latin"],
   variable: "--font-utility",
   display: "swap",
 });
 
-// Condensed display — Markets section opener and its big figures only
+// Condensed display — section openers, big figures, the F1 headline
 export const condensed = Archivo_Narrow({
   weight: ["600", "700"],
   subsets: ["latin"],
   variable: "--font-condensed",
+  display: "swap",
+});
+
+// Terminal, technical labels, coordinates, blueprint annotations
+export const mono = JetBrains_Mono({
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+// Margin notes and signatures — the handwriting in the margins
+export const hand = Caveat({
+  weight: ["500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-hand",
   display: "swap",
 });
 
@@ -49,4 +67,6 @@ export const fontVariables = [
   body.variable,
   utility.variable,
   condensed.variable,
+  mono.variable,
+  hand.variable,
 ].join(" ");
