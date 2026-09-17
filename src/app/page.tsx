@@ -1,5 +1,4 @@
-import { Nameplate } from "@/components/Nameplate";
-import { SectionBar } from "@/components/SectionBar";
+import { PageHeader } from "@/components/PageHeader";
 import { Rule } from "@/components/Rule";
 import { Kicker } from "@/components/Kicker";
 import { Article } from "@/components/Article";
@@ -9,13 +8,7 @@ import { ColumnGrid } from "@/components/ColumnGrid";
 export default function FrontPage() {
   return (
     <main className="mx-auto max-w-[1180px] w-full px-5 py-7 bg-paper text-ink">
-      <Nameplate
-        edition="Vol. I · No. 1"
-        dateline="Patna · Phagwara · Chaibasa"
-        tagline={["Backend Engineer", "Distributed Systems & Cloud Infrastructure", "Also known as Haunts"]}
-      />
-      <Rule />
-      <SectionBar active="/" />
+      <PageHeader active="/" />
 
       <div className="mt-5">
         <ColumnGrid columns={3}>
