@@ -64,6 +64,57 @@ function tornPoints(A: Pt, B: Pt): Pt[] {
   });
 }
 
+// Deterministic hash so the torn edge has a fixed fibrous pattern —
+// stable as A/B move, instead of flickering with Math.random().
+function hash(i: number): number {
+  const x = Math.sin(i * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+type Fiber = { x1: number; y1: number; x2: number; y2: number; op: number };
+
+/** A ragged, feathered band along A-B — the actual torn-paper edge,
+ * not a clean line: a jittered-width ribbon plus short fiber ticks
+ * spiking off it, the way a hand-torn sheet's edge frays. */
+function tearRibbon(A: Pt, B: Pt): { ribbonPoints: string; fibers: Fiber[] } {
+  const dx = B.x - A.x;
+  const dy = B.y - A.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len;
+  const ny = dx / len;
+  const N = 20;
+  const amp = Math.min(9, len * 0.04);
+  const upper: Pt[] = [];
+  const lower: Pt[] = [];
+  const fibers: Fiber[] = [];
+
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const baseX = A.x + dx * t;
+    const baseY = A.y + dy * t;
+    const j = hash(i) * 2 - 1;
+    const cx = baseX + nx * j * amp;
+    const cy = baseY + ny * j * amp;
+    const halfW = 1 + Math.abs(j) * 3.4;
+    upper.push({ x: cx + nx * halfW, y: cy + ny * halfW });
+    lower.push({ x: cx - nx * halfW, y: cy - ny * halfW });
+    if (i % 2 === 1) {
+      const flen = 3 + hash(i + 50) * 9;
+      const dir = j >= 0 ? 1 : -1;
+      fibers.push({
+        x1: cx,
+        y1: cy,
+        x2: cx + nx * flen * dir,
+        y2: cy + ny * flen * dir,
+        op: 0.22 + hash(i + 90) * 0.4,
+      });
+    }
+  }
+
+  const ribbon = [...upper, ...lower.reverse()];
+  return { ribbonPoints: ribbon.map((pt) => `${pt.x},${pt.y}`).join(" "), fibers };
+}
+
 function bulge(from: Pt, to: Pt, awayFrom: Pt, amount: number): Pt {
   const mx = (from.x + to.x) / 2;
   const my = (from.y + to.y) / 2;
@@ -89,6 +140,7 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
   const [resting, setResting] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [phase, setPhase] = useState<"attached" | "detaching" | "removed">("attached");
+  const [detachT, setDetachT] = useState(0);
 
   const pRef = useRef(p);
   useEffect(() => {
@@ -172,16 +224,17 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
     rafRef.current = requestAnimationFrame(step);
   }, [clamp]);
 
-  // The sheet tears free: fling it on past the edge, fading, then
-  // stop rendering the newspaper layer entirely.
+  // The sheet tears free: it turns — rotating about the torn hinge,
+  // not just sliding away — while the crease itself keeps peeling
+  // open, then fades in its last third and stops rendering.
   const runDetach = useCallback(() => {
     setPhase("detaching");
     const { w, h } = rectRef.current;
     const start = pRef.current;
     const t0 = performance.now();
-    const dur = 620;
+    const dur = 760;
     const from = { u: start.u, v: start.v };
-    const to = { u: w * 1.35, v: h * 1.35 };
+    const to = { u: w * 1.5, v: h * 1.45 };
 
     const step = (now: number) => {
       const t = Math.min((now - t0) / dur, 1);
@@ -189,6 +242,7 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
       const next = { u: from.u + (to.u - from.u) * ease, v: from.v + (to.v - from.v) * ease };
       pRef.current = next;
       setP(next);
+      setDetachT(t);
       if (t < 1) {
         rafRef.current = requestAnimationFrame(step);
       } else {
@@ -282,6 +336,7 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
     draggingRef.current = false;
     setDragging(false);
     setResting(true);
+    setDetachT(0);
     setPhase("attached");
     pRef.current = { u: DEFAULT_U, v: DEFAULT_V };
     setP(pRef.current);
@@ -326,6 +381,23 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
         : "") +
       "Z"
     : "";
+
+  // Turning, not fading: the flap rotates about the torn hinge as it
+  // detaches, easing in a moderate arc, with a slight recede in scale
+  // and only fading in its final third — reads as a page being
+  // flipped and flung away, not a shape sliding off and dissolving.
+  const detachEase = detachT * detachT * (3 - 2 * detachT);
+  const hingeMid = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+  const flapTransform =
+    phase === "detaching"
+      ? {
+          transform: `rotate(${-58 * detachEase}deg) scale(${1 - 0.14 * detachEase})`,
+          transformOrigin: `${hingeMid.x}px ${hingeMid.y}px`,
+          opacity: detachT < 0.62 ? 1 : Math.max(0, 1 - (detachT - 0.62) / 0.38),
+        }
+      : undefined;
+
+  const tearVisual = tearing ? tearRibbon(A, B) : null;
 
   if (phase === "removed") {
     return (
@@ -378,11 +450,15 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
                 <feComposite in="grain" in2="SourceGraphic" operator="in" result="grainClip" />
                 <feBlend in="grainClip" in2="SourceGraphic" mode="multiply" />
               </filter>
+              <filter id="tearBlur" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="0.9" />
+              </filter>
             </defs>
             <g
               className={
                 resting && !dragging && phase === "attached" ? "peel-idle-drift" : undefined
               }
+              style={flapTransform}
             >
               <path d={flapPath} fill="url(#peelShade)" className="peel-flap" />
               <path d={flapPath} fill="transparent" filter="url(#peelGrain)" className="peel-flap-grain" />
@@ -392,12 +468,25 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
                 fill="none"
               />
               {!tearing && <line x1={A.x} y1={A.y} x2={B.x} y2={B.y} className="peel-hinge" />}
-              {tearing && (
-                <polyline
-                  points={[A, ...hingePts, B].map((pt) => `${pt.x},${pt.y}`).join(" ")}
-                  className="peel-tear-line"
-                  fill="none"
-                />
+              {tearVisual && (
+                <g className="peel-tear">
+                  <polygon
+                    points={tearVisual.ribbonPoints}
+                    className="peel-tear-ribbon"
+                    filter="url(#tearBlur)"
+                  />
+                  {tearVisual.fibers.map((f, i) => (
+                    <line
+                      key={i}
+                      x1={f.x1}
+                      y1={f.y1}
+                      x2={f.x2}
+                      y2={f.y2}
+                      className="peel-tear-fiber"
+                      style={{ opacity: f.op }}
+                    />
+                  ))}
+                </g>
               )}
             </g>
           </svg>
