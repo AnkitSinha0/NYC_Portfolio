@@ -13,9 +13,8 @@ import { ColumnGrid } from "@/components/ColumnGrid";
  */
 export function CleanFront() {
   return (
-    <main
-      className="mx-auto max-w-[1180px] w-full h-full px-5 py-6 bg-paper text-ink overflow-hidden flex flex-col justify-center"
-    >
+    <main className="w-full h-full px-8 md:px-14 py-6 bg-paper text-ink overflow-hidden flex flex-col justify-center">
+
       <PageHeader active="/" />
 
       <div className="mt-4">

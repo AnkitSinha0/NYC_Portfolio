@@ -14,18 +14,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *     the true corner C=(W,0) to P. That line meets the top edge at
  *     A and the right edge at B — by construction, folding the
  *     triangle A-C-B over line A-B lands C exactly on P.
- *   - So the newspaper's visible region is the page minus triangle
- *     A-C-B (a clip-path), and the physical flap you see is triangle
- *     A-P-B, drawn with a shaded gradient standing in for its back.
+ *   - The newspaper's visible region is the page minus that triangle
+ *     (a clip-path), and the physical flap is the same triangle,
+ *     redrawn with curved outer edges, paper grain, and a shading
+ *     gradient standing in for its back.
  *
  * On release it doesn't snap anywhere — it relaxes toward a
- * gravity-sagged rest point under a damped spring, oscillates once
- * or twice, and then just hangs there until grabbed again.
+ * gravity-sagged rest point under a damped spring and just hangs
+ * until grabbed again. Pull far enough and it tears free instead:
+ * the hinge roughens into a torn edge and the sheet falls away,
+ * permanently revealing the page underneath. A small link brings it
+ * back.
  */
 
 const MIN_U = 10;
 const MIN_V = 8;
-const MAX_FRACTION = 0.86; // never let the crease approach the far corner
+const MAX_FRACTION = 0.92;
 const DEFAULT_U = 78; // resting "dog-ear" — always a little lifted, always grabbable
 const DEFAULT_V = 58;
 
@@ -35,7 +39,47 @@ const DAMPING = 11;
 const GRAVITY_PULL = 0.22; // fraction of remaining slack the corner sags on release
 const SETTLE_EPS = 0.06;
 
+// past this fraction of the max pull, the hinge starts to roughen
+const TEAR_START = 0.62;
+// release past this fraction and the sheet tears free rather than hangs
+const TEAR_RELEASE = 0.82;
+
+// fixed pattern so the torn edge has a consistent, non-jittery shape
+// as A and B move — amplitude multipliers, not raw pixels.
+const TEAR_JITTER = [0.35, -0.65, 0.85, -0.3, 0.6, -0.8, 0.4, -0.5, 0.7, -0.4];
+
 type Vec = { u: number; v: number };
+type Pt = { x: number; y: number };
+
+function tornPoints(A: Pt, B: Pt): Pt[] {
+  const dx = B.x - A.x;
+  const dy = B.y - A.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len;
+  const ny = dx / len;
+  const amp = Math.min(11, len * 0.045);
+  return TEAR_JITTER.map((j, i) => {
+    const t = (i + 1) / (TEAR_JITTER.length + 1);
+    return { x: A.x + dx * t + nx * j * amp, y: A.y + dy * t + ny * j * amp };
+  });
+}
+
+function bulge(from: Pt, to: Pt, awayFrom: Pt, amount: number): Pt {
+  const mx = (from.x + to.x) / 2;
+  const my = (from.y + to.y) / 2;
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const len = Math.hypot(dx, dy) || 1;
+  let nx = -dy / len;
+  let ny = dx / len;
+  // point the bulge away from the triangle's own centroid
+  const toMid = { x: mx - awayFrom.x, y: my - awayFrom.y };
+  if (nx * toMid.x + ny * toMid.y < 0) {
+    nx = -nx;
+    ny = -ny;
+  }
+  return { x: mx + nx * amount, y: my + ny * amount };
+}
 
 export function NewspaperPeel({ children }: { children: React.ReactNode }) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -44,6 +88,7 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
   const [p, setP] = useState<Vec>({ u: DEFAULT_U, v: DEFAULT_V });
   const [resting, setResting] = useState(true);
   const [dragging, setDragging] = useState(false);
+  const [phase, setPhase] = useState<"attached" | "detaching" | "removed">("attached");
 
   const pRef = useRef(p);
   useEffect(() => {
@@ -52,8 +97,8 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
   const velRef = useRef({ u: 0, v: 0 });
   const lastMoveRef = useRef<{ u: number; v: number; t: number } | null>(null);
   const rafRef = useRef<number | null>(null);
+  const draggingRef = useRef(false);
 
-  // Track container size so the geometry stays correct on resize.
   useEffect(() => {
     const el = hostRef.current;
     if (!el) return;
@@ -73,6 +118,11 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
       u: Math.min(Math.max(v.u, MIN_U), w * MAX_FRACTION),
       v: Math.min(Math.max(v.v, MIN_V), h * MAX_FRACTION),
     };
+  }, []);
+
+  const peelRatio = useCallback((v: Vec) => {
+    const { w, h } = rectRef.current;
+    return (v.u / (w * MAX_FRACTION) + v.v / (h * MAX_FRACTION)) / 2;
   }, []);
 
   const stopSpring = useCallback(() => {
@@ -122,6 +172,33 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
     rafRef.current = requestAnimationFrame(step);
   }, [clamp]);
 
+  // The sheet tears free: fling it on past the edge, fading, then
+  // stop rendering the newspaper layer entirely.
+  const runDetach = useCallback(() => {
+    setPhase("detaching");
+    const { w, h } = rectRef.current;
+    const start = pRef.current;
+    const t0 = performance.now();
+    const dur = 620;
+    const from = { u: start.u, v: start.v };
+    const to = { u: w * 1.35, v: h * 1.35 };
+
+    const step = (now: number) => {
+      const t = Math.min((now - t0) / dur, 1);
+      const ease = t * t * (3 - 2 * t);
+      const next = { u: from.u + (to.u - from.u) * ease, v: from.v + (to.v - from.v) * ease };
+      pRef.current = next;
+      setP(next);
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(step);
+      } else {
+        rafRef.current = null;
+        setPhase("removed");
+      }
+    };
+    rafRef.current = requestAnimationFrame(step);
+  }, []);
+
   const toLocal = useCallback((clientX: number, clientY: number): Vec => {
     const el = hostRef.current;
     if (!el) return pRef.current;
@@ -129,23 +206,21 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
     return { u: r.width - (clientX - r.left), v: clientY - r.top };
   }, []);
 
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent) => {
+  const beginDrag = useCallback(
+    (clientX: number, clientY: number) => {
       stopSpring();
+      draggingRef.current = true;
       setDragging(true);
       setResting(false);
-      (e.target as Element).setPointerCapture(e.pointerId);
-      lastMoveRef.current = { ...toLocal(e.clientX, e.clientY), t: performance.now() };
-      e.preventDefault();
+      lastMoveRef.current = { ...toLocal(clientX, clientY), t: performance.now() };
     },
     [stopSpring, toLocal],
   );
 
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!dragging) return;
-      const raw = toLocal(e.clientX, e.clientY);
-      const next = clamp(raw);
+  const moveDrag = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!draggingRef.current) return;
+      const next = clamp(toLocal(clientX, clientY));
       const now = performance.now();
       const last = lastMoveRef.current;
       if (last) {
@@ -156,16 +231,61 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
       pRef.current = next;
       setP(next);
     },
-    [dragging, clamp, toLocal],
+    [clamp, toLocal],
   );
 
   const endDrag = useCallback(() => {
-    if (!dragging) return;
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
     setDragging(false);
-    runSpring();
-  }, [dragging, runSpring]);
+    if (peelRatio(pRef.current) >= TEAR_RELEASE) {
+      runDetach();
+    } else {
+      runSpring();
+    }
+  }, [peelRatio, runDetach, runSpring]);
+
+  // React's pointer-capture-and-forget model is exactly what breaks
+  // "grab it again" if any single event gets lost (fast flicks,
+  // the pointer leaving the window mid-drag, etc.) — so on top of
+  // capture, a window-level listener guarantees the drag always ends
+  // and the sheet is always regrabbable afterwards.
+  useEffect(() => {
+    if (!dragging) return;
+    const onMove = (e: PointerEvent) => moveDrag(e.clientX, e.clientY);
+    const onUp = () => endDrag();
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    window.addEventListener("blur", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      window.removeEventListener("blur", onUp);
+    };
+  }, [dragging, moveDrag, endDrag]);
 
   useEffect(() => stopSpring, [stopSpring]);
+
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (phase !== "attached") return;
+      beginDrag(e.clientX, e.clientY);
+      e.preventDefault();
+    },
+    [phase, beginDrag],
+  );
+
+  const reattach = useCallback(() => {
+    stopSpring();
+    draggingRef.current = false;
+    setDragging(false);
+    setResting(true);
+    setPhase("attached");
+    pRef.current = { u: DEFAULT_U, v: DEFAULT_V };
+    setP(pRef.current);
+  }, [stopSpring]);
 
   // ── geometry ──
   const measured = size.w > 1 && size.h > 1;
@@ -176,25 +296,49 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
   const f = { x: p.v, y: p.u }; // perpendicular to (P - C)
 
   const tTop = p.u > 0.001 ? -M.y / f.y : 0;
-  const A = {
-    x: Math.min(Math.max(M.x + tTop * f.x, 0), w),
-    y: 0,
-  };
+  const A = { x: Math.min(Math.max(M.x + tTop * f.x, 0), w), y: 0 };
   const tRight = p.v > 0.001 ? (w - M.x) / f.x : 0;
-  const B = {
-    x: w,
-    y: Math.min(Math.max(M.y + tRight * f.y, 0), h),
-  };
+  const B = { x: w, y: Math.min(Math.max(M.y + tRight * f.y, 0), h) };
 
+  const ratio = (p.u / (w * MAX_FRACTION) + p.v / (h * MAX_FRACTION)) / 2;
+  const tearing = ratio >= TEAR_START;
+  const hingePts = tearing ? tornPoints(A, B) : [];
+
+  const hingeClipSegment = hingePts.map((pt) => `${pt.x}px ${pt.y}px`).join(", ");
   const clipPath = measured
-    ? `polygon(0 0, ${A.x}px 0, ${w}px ${B.y}px, ${w}px ${h}px, 0 ${h}px)`
+    ? `polygon(0 0, ${A.x}px 0, ${hingeClipSegment ? hingeClipSegment + ", " : ""}${w}px ${B.y}px, ${w}px ${h}px, 0 ${h}px)`
     : undefined;
-  const flapPoints = `${A.x},${A.y} ${P.x},${P.y} ${B.x},${B.y}`;
+
+  const centroid = { x: (A.x + P.x + B.x) / 3, y: (A.y + P.y + B.y) / 3 };
+  const segAP = Math.hypot(P.x - A.x, P.y - A.y);
+  const segPB = Math.hypot(B.x - P.x, B.y - P.y);
+  const c1 = bulge(A, P, centroid, Math.min(16, segAP * 0.1));
+  const c2 = bulge(P, B, centroid, Math.min(16, segPB * 0.1));
+
+  const flapPath = measured
+    ? `M ${A.x},${A.y} Q ${c1.x},${c1.y} ${P.x},${P.y} Q ${c2.x},${c2.y} ${B.x},${B.y} ` +
+      (hingePts.length
+        ? hingePts
+            .slice()
+            .reverse()
+            .map((pt) => `L ${pt.x},${pt.y} `)
+            .join("")
+        : "") +
+      "Z"
+    : "";
+
+  if (phase === "removed") {
+    return (
+      <button type="button" className="peel-restore" onClick={reattach}>
+        The Ankit Times ↗
+      </button>
+    );
+  }
 
   return (
     <div
       ref={hostRef}
-      className={`peel-host${dragging ? " dragging" : ""}`}
+      className={`peel-host${dragging ? " dragging" : ""}${phase === "detaching" ? " detaching" : ""}`}
       style={{ position: "absolute", inset: 0 }}
     >
       <div className="peel-page" style={{ clipPath, WebkitClipPath: clipPath }}>
@@ -209,35 +353,74 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
             height={h}
             viewBox={`0 0 ${w} ${h}`}
             style={{ position: "absolute", inset: 0, overflow: "visible" }}
-            aria-hidden="true"
           >
             <defs>
               <linearGradient id="peelShade" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="var(--paper-hi)" />
-                <stop offset="55%" stopColor="var(--paper-lo)" />
+                <stop offset="45%" stopColor="var(--paper)" />
+                <stop offset="80%" stopColor="var(--paper-lo)" />
                 <stop offset="100%" stopColor="var(--hair-2)" />
               </linearGradient>
+              <filter id="peelGrain" x="-30%" y="-30%" width="160%" height="160%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.012 0.55"
+                  numOctaves="2"
+                  seed="7"
+                  result="noise"
+                />
+                <feColorMatrix
+                  in="noise"
+                  type="matrix"
+                  values="0 0 0 0 0.35  0 0 0 0 0.32  0 0 0 0 0.26  0 0 0 0.5 0"
+                  result="grain"
+                />
+                <feComposite in="grain" in2="SourceGraphic" operator="in" result="grainClip" />
+                <feBlend in="grainClip" in2="SourceGraphic" mode="multiply" />
+              </filter>
             </defs>
-            <g className={resting && !dragging ? "peel-idle-drift" : undefined}>
-              <polygon points={flapPoints} fill="url(#peelShade)" className="peel-flap" />
-              <line x1={A.x} y1={A.y} x2={B.x} y2={B.y} className="peel-hinge" />
+            <g
+              className={
+                resting && !dragging && phase === "attached" ? "peel-idle-drift" : undefined
+              }
+            >
+              <path d={flapPath} fill="url(#peelShade)" className="peel-flap" />
+              <path d={flapPath} fill="transparent" filter="url(#peelGrain)" className="peel-flap-grain" />
+              <path
+                d={`M ${A.x},${A.y} L ${c1.x},${c1.y} L ${P.x},${P.y}`}
+                className="peel-highlight"
+                fill="none"
+              />
+              {!tearing && <line x1={A.x} y1={A.y} x2={B.x} y2={B.y} className="peel-hinge" />}
+              {tearing && (
+                <polyline
+                  points={[A, ...hingePts, B].map((pt) => `${pt.x},${pt.y}`).join(" ")}
+                  className="peel-tear-line"
+                  fill="none"
+                />
+              )}
             </g>
           </svg>
 
-          {/* the actual grab target — generous hit area around the flap tip */}
-          <div
-            className="peel-handle"
-            style={{ left: P.x, top: P.y }}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={endDrag}
-            onPointerCancel={endDrag}
-            role="button"
-            tabIndex={0}
-            aria-label="Peel the front page back to see the profile underneath"
-          />
+          {/* the whole visible flap is grabbable, not just its tip */}
+          <svg
+            className="peel-hit-svg"
+            width={w}
+            height={h}
+            viewBox={`0 0 ${w} ${h}`}
+            style={{ position: "absolute", inset: 0 }}
+          >
+            <path
+              d={flapPath}
+              className="peel-hit"
+              onPointerDown={onPointerDown}
+              role="button"
+              tabIndex={0}
+              aria-label="Peel the front page back to see the profile underneath"
+            />
+          </svg>
 
-          {resting && !dragging && p.u < DEFAULT_U * 1.3 && p.v < DEFAULT_V * 1.3 && (
+          {resting && !dragging && phase === "attached" && p.u < DEFAULT_U * 1.3 && p.v < DEFAULT_V * 1.3 && (
             <div className="peel-hint" style={{ right: Math.max(w * 0.02, 12) }}>
               <span className="arrow">↙</span>
               Pull to reveal

@@ -1424,9 +1424,24 @@ table.laps td:first-child {
   stroke: var(--hair);
   stroke-width: 1;
 }
+.peel-flap-grain {
+  opacity: 0.9;
+}
+.peel-highlight {
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
 .peel-hinge {
   stroke: rgba(0, 0, 0, 0.18);
   stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.peel-tear-line {
+  stroke: rgba(70, 60, 45, 0.55);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
   stroke-linecap: round;
 }
 .peel-idle-drift {
@@ -1442,18 +1457,43 @@ table.laps td:first-child {
     transform: translate(1.4px, -1px) rotate(0.25deg);
   }
 }
-.peel-handle {
-  position: absolute;
+.peel-hit-svg {
   z-index: 4;
-  width: 64px;
-  height: 64px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
+}
+.peel-hit {
+  fill: transparent;
   cursor: grab;
   touch-action: none;
 }
-.peel-host.dragging .peel-handle {
+.peel-host.dragging .peel-hit {
   cursor: grabbing;
+}
+.peel-host.detaching {
+  pointer-events: none;
+}
+.peel-host.detaching .peel-flap-svg {
+  filter: drop-shadow(10px 22px 26px rgba(0, 0, 0, 0.45));
+}
+.peel-restore {
+  position: absolute;
+  top: 16px;
+  right: clamp(16px, 3vw, 40px);
+  z-index: 20;
+  background: none;
+  border: 0;
+  padding: 6px 2px;
+  font-family: var(--font-utility), sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--soft);
+  cursor: pointer;
+  border-bottom: 1px solid var(--hair);
+}
+.peel-restore:hover {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
 }
 .peel-hint {
   position: absolute;
