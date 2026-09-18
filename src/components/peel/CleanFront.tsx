@@ -1,175 +1,85 @@
-import Image from "next/image";
-import Link from "next/link";
-
-const PROJECTS = [
-  {
-    slug: "hashvault",
-    name: "HashVault",
-    blurb: "Distributed cloud storage with SHA-256 deduplication, presigned S3 uploads and async processing.",
-    tags: ["Go", "PostgreSQL", "Redis", "S3"],
-  },
-  {
-    slug: "konnect",
-    name: "Konnect",
-    blurb: "Real-time chat platform across six microservices, event-driven on RabbitMQ and Kafka.",
-    tags: ["Node.js", "MongoDB", "Socket.IO"],
-  },
-];
+import { Nameplate } from "@/components/Nameplate";
+import { SectionBar } from "@/components/SectionBar";
+import { Rule } from "@/components/Rule";
+import { Kicker } from "@/components/Kicker";
+import { Plate } from "@/components/Plate";
 
 /**
- * The clean page underneath — deliberately a different register from
- * the newspaper above it, not a smaller copy of it: sans-serif, card
- * grid, buttons. Modern editorial, the way the front page would read
- * if it were designed for reading rather than for character.
+ * The clean page underneath — the same NYC broadsheet identity as
+ * the peeled front page, not a different genre. What changes isn't
+ * the style, it's the density: one story, one portrait, one profile
+ * rail. This is the front page set for a recruiter with ninety
+ * seconds, not for character — the "professional reader version."
  */
 export function CleanFront() {
   return (
-    <main className="w-full h-full overflow-hidden bg-paper text-ink flex flex-col">
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-10 px-8 md:px-16 py-10 md:py-14 min-h-0">
-        {/* ── left: identity + work ── */}
-        <div className="flex flex-col min-h-0 overflow-hidden">
-          <div className="flex items-baseline justify-between text-[10px] font-bold tracking-[0.18em] uppercase text-soft mb-5">
-            <span>Software Engineer</span>
-            <span>Patna, India</span>
-          </div>
+    <main className="w-full h-full px-8 md:px-14 py-7 bg-paper text-ink overflow-hidden flex flex-col">
+      <Nameplate
+        edition="Vol. I · No. 1"
+        dateline="Patna, India"
+        tagline={["Backend Engineer", "Distributed Systems & Cloud Infrastructure", "ankitsin.in"]}
+      />
+      <Rule />
+      <SectionBar active="/" />
 
-          <h1 className="font-utility font-black text-[clamp(2.4rem,4.6vw,4rem)] leading-[0.98] tracking-[-0.02em] text-ink m-0">
-            Ankit Sinha<span className="text-red">.</span>
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-10 mt-6 min-h-0">
+        <div className="min-h-0 overflow-hidden">
+          <Kicker accent>The Lead · Go</Kicker>
+          <h1 className="font-display font-bold text-[clamp(1.9rem,3.6vw,2.9rem)] leading-[1.03] tracking-[-0.01em] text-balance m-0 mb-2">
+            The Same Bytes, Stored Once
           </h1>
-          <p className="font-body text-[15px] md:text-[16px] leading-[1.5] text-soft mt-3 max-w-[46ch]">
-            I build backend systems and storage infrastructure for a more open internet —
-            distributed, dependable, and built to survive real production traffic.
+          <p className="text-[9.5px] font-bold tracking-[0.14em] uppercase text-soft mb-4">
+            By Ankit Sinha · HashVault · Mar 2026
+          </p>
+          <p className="font-body text-[14.5px] leading-[1.6] max-w-[62ch] first-letter:font-display first-letter:font-black first-letter:text-[3.1em] first-letter:leading-[0.8] first-letter:float-left first-letter:pr-[0.09em] first-letter:pt-[0.02em]">
+            Two users upload the same file. Most systems store it twice. HashVault hashes the
+            content with SHA-256 and resolves identical bytes to a single S3 key — reference
+            counts increment and decrement atomically in SQL, and the object is purged from S3 and
+            Postgres only when the count reaches zero. A dedup hit skips the upload round trip
+            entirely.
+          </p>
+          <p className="font-body italic text-[12.5px] text-soft mt-3">
+            Continued in Work — the two-token auth scheme and the RabbitMQ pipeline.
           </p>
 
-          <div className="flex items-center gap-5 mt-6">
-            <Link
-              href="/work"
-              className="inline-flex items-center gap-2 bg-ink text-paper text-[11.5px] font-bold tracking-[0.08em] uppercase px-5 py-3 hover:opacity-85 transition-opacity"
-            >
-              View My Work →
-            </Link>
-            <Link
-              href="/resume"
-              className="text-[11.5px] font-bold tracking-[0.08em] uppercase text-ink border-b border-hair hover:border-ink pb-0.5 transition-colors"
-            >
-              View Résumé
-            </Link>
-          </div>
+          <Rule weight="hairline" className="my-5" />
 
-          <div className="flex items-baseline justify-between mt-9 mb-3">
-            <h2 className="text-[10px] font-bold tracking-[0.2em] uppercase text-soft m-0">
-              Selected Work
-            </h2>
-            <Link href="/work" className="text-[10px] font-bold tracking-[0.1em] uppercase text-soft hover:text-ink">
-              View All →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {PROJECTS.map((p) => (
-              <Link
-                key={p.slug}
-                href={`/work/${p.slug}`}
-                className="block border border-hair p-4 hover:border-ink transition-colors"
-              >
-                <h3 className="font-utility font-bold text-[15px] tracking-[-0.01em] m-0 mb-1.5">
-                  {p.name}
-                </h3>
-                <p className="font-body text-[11.5px] leading-[1.45] text-soft m-0 mb-3">
-                  {p.blurb}
-                </p>
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {p.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="text-[9px] font-bold tracking-[0.06em] uppercase text-soft border border-hair px-1.5 py-0.5"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <span className="text-[10px] font-bold tracking-[0.08em] uppercase text-ink">
-                  Case Study →
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* ── right: portrait + data ── */}
-        <div className="flex flex-col min-h-0">
-          <div className="relative aspect-[4/3] w-full flex-shrink-0 overflow-hidden">
-            <Image
-              src="/ankit-sinha.png"
-              alt="Ankit Sinha"
-              fill
-              sizes="(max-width: 1024px) 100vw, 45vw"
-              className="object-cover grayscale"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-6 mt-6">
-            <div>
-              <h3 className="text-[9.5px] font-bold tracking-[0.16em] uppercase text-soft m-0 mb-2">
-                Tech Stack
-              </h3>
-              <dl className="font-body text-[11.5px] leading-[1.6] space-y-1.5">
-                <div>
-                  <dt className="inline font-bold text-ink">Languages </dt>
-                  <dd className="inline text-soft">Go, Python, TypeScript, C++</dd>
-                </div>
-                <div>
-                  <dt className="inline font-bold text-ink">Backend </dt>
-                  <dd className="inline text-soft">Gin, Node, Express, FastAPI</dd>
-                </div>
-                <div>
-                  <dt className="inline font-bold text-ink">Data </dt>
-                  <dd className="inline text-soft">PostgreSQL, MongoDB, Redis</dd>
-                </div>
-              </dl>
-            </div>
-            <div>
-              <h3 className="text-[9.5px] font-bold tracking-[0.16em] uppercase text-soft m-0 mb-2">
-                Problem Solving
-              </h3>
-              <dl className="font-body text-[11.5px] leading-[1.6] space-y-1.5">
-                <div>
-                  <dt className="inline font-bold text-ink">LeetCode </dt>
-                  <dd className="inline text-soft">131 solved · 64-day streak</dd>
-                </div>
-                <div>
-                  <dt className="inline font-bold text-ink">Codeforces </dt>
-                  <dd className="inline text-soft">655 rated</dd>
-                </div>
-              </dl>
-              <Link
-                href="/markets"
-                className="inline-block mt-2 text-[10px] font-bold tracking-[0.08em] uppercase text-ink border-b border-hair hover:border-ink"
-              >
-                View Profiles →
-              </Link>
-            </div>
-          </div>
-
-          <p className="font-body italic text-[13px] text-soft mt-auto pt-6">
-            “Building tools for a more open internet.”
+          <Kicker>Also This Edition</Kicker>
+          <p className="font-body text-[13px] leading-[1.55] max-w-[62ch]">
+            <strong className="font-display font-bold">Konnect</strong> — a real-time chat
+            platform across six microservices, event-driven on RabbitMQ and Kafka. And a
+            dispatch from Denthinkers Foundation: payments confirmed on cryptographic proof, not
+            client-reported status.
           </p>
         </div>
-      </div>
 
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 border-t border-hair text-[10px] font-bold tracking-[0.1em] uppercase text-soft">
-        <span>Let&rsquo;s build something interesting.</span>
-        <div className="flex gap-5">
-          <a href="https://github.com/AnkitSinha0" target="_blank" rel="noopener noreferrer" className="hover:text-ink">
-            GitHub
-          </a>
-          <a href="https://www.linkedin.com/in/ankit0sinha/" target="_blank" rel="noopener noreferrer" className="hover:text-ink">
-            LinkedIn
-          </a>
-          <a href="https://x.com/Haunts_01" target="_blank" rel="noopener noreferrer" className="hover:text-ink">
-            X
-          </a>
-        </div>
+        <aside className="min-h-0 flex flex-col">
+          <Plate
+            src="/ankit-sinha.png"
+            alt="Portrait of Ankit Sinha"
+            caption="Also known as Haunts."
+            duotone
+          />
+
+          <Rule weight="hairline" className="my-4" />
+
+          <Kicker>Profile</Kicker>
+          <dl className="font-body text-[12px] leading-[1.5] mb-4">
+            <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-1.5">
+              Solving
+            </dt>
+            <dd className="mt-0.5">LeetCode 131 solved, 64-day streak · Codeforces 655</dd>
+            <dt className="font-utility text-[8.5px] font-bold tracking-[0.14em] uppercase text-soft mt-1.5">
+              Stack
+            </dt>
+            <dd className="mt-0.5">Go, TypeScript, PostgreSQL, Redis, Docker</dd>
+          </dl>
+
+          <div className="mt-auto pt-3 border-t border-hair flex items-center justify-between text-[10px] font-bold tracking-[0.1em] uppercase text-soft">
+            <span>Let&rsquo;s talk</span>
+            <span>GitHub · LinkedIn · X</span>
+          </div>
+        </aside>
       </div>
     </main>
   );

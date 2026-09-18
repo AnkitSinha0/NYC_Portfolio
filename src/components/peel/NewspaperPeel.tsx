@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
 /**
  * Physically peels a corner of `children` (the newspaper layer) back
@@ -71,19 +72,21 @@ function hash(i: number): number {
   return x - Math.floor(x);
 }
 
-type Fiber = { x1: number; y1: number; x2: number; y2: number; op: number };
+type Fiber = { x1: number; y1: number; x2: number; y2: number; op: number; w: number };
 
-/** A ragged, feathered band along A-B — the actual torn-paper edge,
- * not a clean line: a jittered-width ribbon plus short fiber ticks
- * spiking off it, the way a hand-torn sheet's edge frays. */
+/** A wide, soft, feathered band along A-B — the actual torn-paper
+ * edge, built the way a hand-torn sheet's edge actually reads: big
+ * irregular peaks, not a fine jagged line, with fibers spiking off
+ * it and the whole thing blurred so it reads as frayed paper rather
+ * than a drawn zigzag. */
 function tearRibbon(A: Pt, B: Pt): { ribbonPoints: string; fibers: Fiber[] } {
   const dx = B.x - A.x;
   const dy = B.y - A.y;
   const len = Math.hypot(dx, dy) || 1;
   const nx = -dy / len;
   const ny = dx / len;
-  const N = 20;
-  const amp = Math.min(9, len * 0.04);
+  const N = 26;
+  const amp = Math.min(30, len * 0.1);
   const upper: Pt[] = [];
   const lower: Pt[] = [];
   const fibers: Fiber[] = [];
@@ -92,23 +95,26 @@ function tearRibbon(A: Pt, B: Pt): { ribbonPoints: string; fibers: Fiber[] } {
     const t = i / N;
     const baseX = A.x + dx * t;
     const baseY = A.y + dy * t;
-    const j = hash(i) * 2 - 1;
+    // low-frequency sway (the overall tear line's drift) plus a
+    // higher-frequency ripple riding on it (the ragged detail)
+    const sway = hash(Math.floor(i / 3)) * 2 - 1;
+    const ripple = hash(i) * 2 - 1;
+    const j = sway * 0.7 + ripple * 0.5;
     const cx = baseX + nx * j * amp;
     const cy = baseY + ny * j * amp;
-    const halfW = 1 + Math.abs(j) * 3.4;
+    const halfW = 3 + Math.abs(j) * 9;
     upper.push({ x: cx + nx * halfW, y: cy + ny * halfW });
     lower.push({ x: cx - nx * halfW, y: cy - ny * halfW });
-    if (i % 2 === 1) {
-      const flen = 3 + hash(i + 50) * 9;
-      const dir = j >= 0 ? 1 : -1;
-      fibers.push({
-        x1: cx,
-        y1: cy,
-        x2: cx + nx * flen * dir,
-        y2: cy + ny * flen * dir,
-        op: 0.22 + hash(i + 90) * 0.4,
-      });
-    }
+    const flen = 5 + hash(i + 50) * 16;
+    const dir = j >= 0 ? 1 : -1;
+    fibers.push({
+      x1: cx,
+      y1: cy,
+      x2: cx + nx * flen * dir,
+      y2: cy + ny * flen * dir,
+      op: 0.18 + hash(i + 90) * 0.32,
+      w: 0.6 + hash(i + 130) * 1.1,
+    });
   }
 
   const ribbon = [...upper, ...lower.reverse()];
@@ -140,7 +146,8 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
   const [resting, setResting] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [phase, setPhase] = useState<"attached" | "detaching" | "removed">("attached");
-  const [detachT, setDetachT] = useState(0);
+  const [turn, setTurn] = useState({ rot: 0, scale: 1, opacity: 1 });
+  const detachProxyRef = useRef<{ u: number; v: number; rot: number; scale: number; op: number } | null>(null);
 
   const pRef = useRef(p);
   useEffect(() => {
@@ -224,33 +231,42 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
     rafRef.current = requestAnimationFrame(step);
   }, [clamp]);
 
-  // The sheet tears free: it turns — rotating about the torn hinge,
-  // not just sliding away — while the crease itself keeps peeling
-  // open, then fades in its last third and stops rendering.
+  // The sheet tears free and turns like a page being flipped: GSAP
+  // drives a proxy object (position + rotation + scale + a delayed
+  // fade) and each tick is pushed into React state. Rotation is
+  // anchored at the pulled corner itself (see transformOrigin below),
+  // not at the hinge — so the torn edge sweeps down through the
+  // bottom of the view as it flips over, instead of pivoting near the
+  // top and vanishing upward.
   const runDetach = useCallback(() => {
     setPhase("detaching");
     const { w, h } = rectRef.current;
     const start = pRef.current;
-    const t0 = performance.now();
-    const dur = 760;
-    const from = { u: start.u, v: start.v };
-    const to = { u: w * 1.5, v: h * 1.45 };
+    const proxy = { u: start.u, v: start.v, rot: 0, scale: 1, op: 1 };
+    detachProxyRef.current = proxy;
 
-    const step = (now: number) => {
-      const t = Math.min((now - t0) / dur, 1);
-      const ease = t * t * (3 - 2 * t);
-      const next = { u: from.u + (to.u - from.u) * ease, v: from.v + (to.v - from.v) * ease };
-      pRef.current = next;
-      setP(next);
-      setDetachT(t);
-      if (t < 1) {
-        rafRef.current = requestAnimationFrame(step);
-      } else {
-        rafRef.current = null;
-        setPhase("removed");
-      }
-    };
-    rafRef.current = requestAnimationFrame(step);
+    gsap.timeline({ onComplete: () => setPhase("removed") }).to(proxy, {
+      u: w * 1.6,
+      v: h * 1.55,
+      rot: 132,
+      scale: 0.7,
+      duration: 0.9,
+      ease: "power2.in",
+      onUpdate: () => {
+        const next = { u: proxy.u, v: proxy.v };
+        pRef.current = next;
+        setP(next);
+        setTurn({ rot: proxy.rot, scale: proxy.scale, opacity: proxy.op });
+      },
+    });
+
+    gsap.to(proxy, {
+      op: 0,
+      duration: 0.4,
+      delay: 0.5,
+      ease: "power1.in",
+      onUpdate: () => setTurn({ rot: proxy.rot, scale: proxy.scale, opacity: proxy.op }),
+    });
   }, []);
 
   const toLocal = useCallback((clientX: number, clientY: number): Vec => {
@@ -333,10 +349,14 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
 
   const reattach = useCallback(() => {
     stopSpring();
+    if (detachProxyRef.current) {
+      gsap.killTweensOf(detachProxyRef.current);
+      detachProxyRef.current = null;
+    }
     draggingRef.current = false;
     setDragging(false);
     setResting(true);
-    setDetachT(0);
+    setTurn({ rot: 0, scale: 1, opacity: 1 });
     setPhase("attached");
     pRef.current = { u: DEFAULT_U, v: DEFAULT_V };
     setP(pRef.current);
@@ -382,18 +402,17 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
       "Z"
     : "";
 
-  // Turning, not fading: the flap rotates about the torn hinge as it
-  // detaches, easing in a moderate arc, with a slight recede in scale
-  // and only fading in its final third — reads as a page being
-  // flipped and flung away, not a shape sliding off and dissolving.
-  const detachEase = detachT * detachT * (3 - 2 * detachT);
-  const hingeMid = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+  // Turning, not fading: the flap rotates about the corner the reader
+  // is holding — P itself — as it detaches, not the hinge. Anchoring
+  // there is what makes the torn edge sweep down through the bottom
+  // of the frame as the sheet turns over, the way an actual page
+  // flip reads, rather than spinning in place near where it tore.
   const flapTransform =
     phase === "detaching"
       ? {
-          transform: `rotate(${-58 * detachEase}deg) scale(${1 - 0.14 * detachEase})`,
-          transformOrigin: `${hingeMid.x}px ${hingeMid.y}px`,
-          opacity: detachT < 0.62 ? 1 : Math.max(0, 1 - (detachT - 0.62) / 0.38),
+          transform: `rotate(${turn.rot}deg) scale(${turn.scale})`,
+          transformOrigin: `${P.x}px ${P.y}px`,
+          opacity: turn.opacity,
         }
       : undefined;
 
@@ -450,8 +469,8 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
                 <feComposite in="grain" in2="SourceGraphic" operator="in" result="grainClip" />
                 <feBlend in="grainClip" in2="SourceGraphic" mode="multiply" />
               </filter>
-              <filter id="tearBlur" x="-60%" y="-60%" width="220%" height="220%">
-                <feGaussianBlur stdDeviation="0.9" />
+              <filter id="tearBlur" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="2.4" />
               </filter>
             </defs>
             <g
@@ -483,7 +502,7 @@ export function NewspaperPeel({ children }: { children: React.ReactNode }) {
                       x2={f.x2}
                       y2={f.y2}
                       className="peel-tear-fiber"
-                      style={{ opacity: f.op }}
+                      style={{ opacity: f.op, strokeWidth: f.w }}
                     />
                   ))}
                 </g>
