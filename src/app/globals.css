@@ -1478,26 +1478,38 @@ table.laps td:first-child {
 .peel-flap-grain {
   opacity: 0.9;
 }
-.peel-highlight {
-  stroke: rgba(255, 255, 255, 0.55);
-  stroke-width: 1.25;
-  stroke-linecap: round;
-  opacity: 0.7;
-}
-.peel-hinge {
-  stroke: rgba(0, 0, 0, 0.18);
+.peel-hinge-curve {
+  stroke: rgba(0, 0, 0, 0.2);
   stroke-width: 1.5;
   stroke-linecap: round;
 }
 .peel-tear-ribbon {
-  fill: rgba(20, 16, 10, 0.14);
-  stroke: rgba(20, 16, 10, 0.22);
-  stroke-width: 0.6;
+  fill: rgba(90, 82, 66, 0.4);
 }
-.peel-tear-fiber {
-  stroke: rgba(20, 16, 10, 0.45);
-  stroke-width: 0.8;
-  stroke-linecap: round;
+.tear-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  height: 22px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.tear-handle::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 4px;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--soft) 0 6px, transparent 6px 12px);
+  opacity: 0.55;
+}
+.newspaper-overlay {
+  user-select: none;
+}
+.tear-handle.active,
+.tear-handle:hover {
+  cursor: grabbing;
 }
 .peel-idle-drift {
   animation: peelDrift 5.4s ease-in-out infinite;
@@ -1522,12 +1534,6 @@ table.laps td:first-child {
 }
 .peel-host.dragging .peel-hit {
   cursor: grabbing;
-}
-.peel-host.detaching {
-  pointer-events: none;
-}
-.peel-host.detaching .peel-flap-svg {
-  filter: drop-shadow(10px 22px 26px rgba(0, 0, 0, 0.45));
 }
 .peel-restore {
   position: absolute;
