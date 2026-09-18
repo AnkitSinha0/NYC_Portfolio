@@ -5,6 +5,7 @@ import {
   Libre_Franklin,
   Archivo_Narrow,
   JetBrains_Mono,
+  Caveat,
 } from "next/font/google";
 
 // Nameplate — the wordmark only. Never body text.
@@ -44,11 +45,19 @@ export const condensed = Archivo_Narrow({
   display: "swap",
 });
 
-// Technical labels — the blueprint plate's title block and annotations
+// Terminal, technical labels, coordinates, blueprint annotations
 export const mono = JetBrains_Mono({
   weight: ["400", "500", "700"],
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
+});
+
+// Margin notes and signatures — the handwriting in the margins
+export const hand = Caveat({
+  weight: ["500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-hand",
   display: "swap",
 });
 
@@ -59,4 +68,5 @@ export const fontVariables = [
   utility.variable,
   condensed.variable,
   mono.variable,
+  hand.variable,
 ].join(" ");
