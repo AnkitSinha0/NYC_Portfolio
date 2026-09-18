@@ -70,6 +70,17 @@
   --press-hair: var(--dark-line);
 }
 
+/* The clean editorial layer's OWN palette — fixed, independent of
+   data-tone. It must never shift when the newspaper's press run
+   changes; the two designs share nothing but the viewport. */
+:root {
+  --clean-bg: #faf7f1;
+  --clean-ink: #17140f;
+  --clean-soft: #6b6459;
+  --clean-hair: #ddd5c6;
+  --clean-red: #7a2a1e;
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-ink: var(--ink);
@@ -81,6 +92,11 @@
   --color-press-ink: var(--press-ink);
   --color-press-soft: var(--press-soft);
   --color-press-hair: var(--press-hair);
+  --color-clean-bg: var(--clean-bg);
+  --color-clean-ink: var(--clean-ink);
+  --color-clean-soft: var(--clean-soft);
+  --color-clean-hair: var(--clean-hair);
+  --color-clean-red: var(--clean-red);
   --font-nameplate: var(--font-nameplate);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
@@ -111,12 +127,29 @@ body {
 /* ── NEWSPAPER OVERLAY — the physical top layer ────────────────
    Fixed to the viewport regardless of the clean page's own scroll
    position underneath. TheAnkitTimes (Rail + all eight sections)
-   renders inside this at full size; NewspaperPeel clips/peels it. */
+   renders inside this at full size.
+
+   Interaction not wired yet (steps 1-4 only) — .corner-hint below is
+   a purely decorative CSS dog-ear, no JS, standing in for where the
+   peel will start once the static composition is confirmed. */
 .newspaper-overlay {
   position: fixed;
   inset: 0;
   height: 100dvh;
   z-index: 50;
+}
+.corner-hint {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 46px;
+  height: 46px;
+  z-index: 60;
+  pointer-events: none;
+  background: linear-gradient(225deg, var(--paper-hi) 0 48%, transparent 49%),
+    linear-gradient(225deg, rgba(0, 0, 0, 0.22) 0 47%, transparent 55%);
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+  box-shadow: -4px 4px 8px -4px rgba(0, 0, 0, 0.35);
 }
 ::selection {
   background: var(--red);

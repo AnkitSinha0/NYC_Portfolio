@@ -5,7 +5,6 @@ import { Terminal } from "@/components/times/Terminal";
 import { Markets } from "@/components/times/Markets";
 import { AnkitTimesFront } from "@/components/peel/AnkitTimesFront";
 import { CleanFront } from "@/components/peel/CleanFront";
-import { NewspaperPeel } from "@/components/peel/NewspaperPeel";
 
 const LAPS: [number, string, number][] = [
   [1, "Learning", 42],
@@ -250,17 +249,20 @@ export default function Home() {
   return (
     <>
       {/* Layer 1 — the real, independently long-scrollable website.
-          Exists from the first render, whether or not anyone ever
-          peels the newspaper back. */}
+          Exists from the first render, whether or not the newspaper
+          on top of it is ever touched. Delete the block below and
+          this alone should stand as a complete site. */}
       <CleanFront />
 
       {/* Layer 2 — fixed over the viewport, physically on top.
-          NewspaperPeel owns the peel/hang/tear interaction; this
-          wrapper only pins it to the screen. */}
+          Interaction (peel / hang / bottom-edge tear) intentionally
+          not implemented yet — this is steps 1-4 only: the newspaper
+          fully covers the screen, with a purely decorative lifted-
+          corner hint (no JS, no drag). The interactive mechanic is
+          the next pass, once this composition is confirmed. */}
       <div className="newspaper-overlay">
-        <NewspaperPeel>
-          <TheAnkitTimes />
-        </NewspaperPeel>
+        <TheAnkitTimes />
+        <span className="corner-hint" aria-hidden="true" />
       </div>
     </>
   );
