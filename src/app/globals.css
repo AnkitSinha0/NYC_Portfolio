@@ -1396,3 +1396,109 @@ table.laps td:first-child {
     stroke-dashoffset: 0;
   }
 }
+
+/* ── PEEL STAGE — the physical newspaper-over-portfolio interaction ── */
+.peel-stage {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+.peel-host {
+  touch-action: none;
+}
+.peel-page {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  will-change: clip-path;
+  z-index: 2;
+}
+.peel-flap-svg {
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(5px 9px 12px rgba(0, 0, 0, 0.4)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+.peel-flap {
+  stroke: var(--hair);
+  stroke-width: 1;
+}
+.peel-hinge {
+  stroke: rgba(0, 0, 0, 0.18);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.peel-idle-drift {
+  animation: peelDrift 5.4s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes peelDrift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(1.4px, -1px) rotate(0.25deg);
+  }
+}
+.peel-handle {
+  position: absolute;
+  z-index: 4;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+}
+.peel-host.dragging .peel-handle {
+  cursor: grabbing;
+}
+.peel-hint {
+  position: absolute;
+  top: 14px;
+  z-index: 4;
+  text-align: right;
+  font-family: var(--font-hand), cursive;
+  font-size: 1.15rem;
+  line-height: 1.15;
+  color: var(--soft);
+  pointer-events: none;
+  animation: peelHintFade 3.2s ease-in-out infinite;
+}
+.peel-hint .arrow {
+  display: block;
+  font-family: var(--font-utility), sans-serif;
+  font-size: 1.3rem;
+  margin-bottom: 2px;
+}
+.peel-hint em {
+  display: block;
+  font-style: italic;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+@keyframes peelHintFade {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+@media (max-width: 860px) {
+  .peel-stage {
+    height: 100svh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .peel-idle-drift {
+    animation: none;
+  }
+  .peel-hint {
+    animation: none;
+    opacity: 0.85;
+  }
+}

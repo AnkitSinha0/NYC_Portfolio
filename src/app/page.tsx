@@ -1,9 +1,11 @@
-import Image from "next/image";
 import { Rail } from "@/components/times/Rail";
 import { Darkroom } from "@/components/times/Darkroom";
 import { Projects } from "@/components/times/Projects";
 import { Terminal } from "@/components/times/Terminal";
 import { Markets } from "@/components/times/Markets";
+import { CleanFront } from "@/components/peel/CleanFront";
+import { NewspaperPeel } from "@/components/peel/NewspaperPeel";
+import { AnkitTimesFront } from "@/components/peel/AnkitTimesFront";
 
 const LAPS: [number, string, number][] = [
   [1, "Learning", 42],
@@ -27,90 +29,12 @@ export default function Home() {
       <Rail />
 
       <main className="stage">
-        {/* ══ 01 FRONT PAGE ══ */}
-        <section className="band cream tex stain" id="s1">
-          <div className="topbar">
-            <span>A Developer&rsquo;s Log</span>
-            <nav>
-              <a href="#s3">Work</a>
-              <a href="#s7">Notes</a>
-              <a href="#s7">Photos</a>
-              <a href="#s2">About</a>
-              <a href="#s8">Contact</a>
-            </nav>
-            <span>Patna, India</span>
-          </div>
-          <hr className="rule-hair" />
-          <h1 className="plate-name">The Ankit Times</h1>
-          <div className="plate-meta">
-            Vol. I, No. 1
-            <br />
-            Sep 18, 2026
-          </div>
-          <hr className="rule-thick" />
-
-          <div className="front">
-            <div>
-              <p className="kick">Technology / People / Ideas</p>
-              <h1>Building Things for a More Open Internet.</h1>
-              <p className="by">By Ankit Sinha · Software Engineer</p>
-              <p className="lede">
-                From distributed systems to random side projects, I like understanding how things
-                work and then building them slightly differently.
-              </p>
-            </div>
-
-            <div className="portrait-wrap">
-              <div className="photo">
-                <Image
-                  src="/ankit-sinha.png"
-                  alt="Ankit Sinha"
-                  fill
-                  sizes="(max-width: 860px) 100vw, 40vw"
-                  priority
-                />
-              </div>
-              <p className="scribble">
-                Just a guy
-                <br />
-                who likes
-                <br />
-                building things
-                <br />— Ankit
-              </p>
-            </div>
-
-            <div className="edition-col">
-              <div className="edition">
-                <h4>In This Edition</h4>
-                <ol>
-                  <li>
-                    <b>01</b>About
-                  </li>
-                  <li>
-                    <b>02</b>Projects
-                  </li>
-                  <li>
-                    <b>03</b>Terminal
-                  </li>
-                  <li>
-                    <b>04</b>F1
-                  </li>
-                  <li>
-                    <b>05</b>Markets
-                  </li>
-                  <li>
-                    <b>06</b>Contact
-                  </li>
-                </ol>
-              </div>
-              <p className="pullquote">
-                “Same Bytes,
-                <br />
-                Stored Once.”
-              </p>
-            </div>
-          </div>
+        {/* ══ 01 FRONT PAGE — peelable newspaper over the clean portfolio ══ */}
+        <section className="peel-stage" id="s1">
+          <CleanFront />
+          <NewspaperPeel>
+            <AnkitTimesFront />
+          </NewspaperPeel>
         </section>
 
         {/* ══ 02 ABOUT ══ */}
