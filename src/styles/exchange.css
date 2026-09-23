@@ -72,6 +72,8 @@ body:has(.cx) { background: #17130f; }
   .cut { position: relative; background: linear-gradient(150deg, #4a4238 0%, #221e18 55%, #0f0d0a 100%); aspect-ratio: 16 / 11; overflow: hidden; display: flex; align-items: center; justify-content: center; }
   .cut::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(231, 223, 202, 0.5) 45%, transparent 46%); background-size: 3.5px 3.5px; mix-blend-mode: screen; opacity: 0.5; }
   .cut b { position: relative; z-index: 2; font-weight: 800; font-size: clamp(10px, 1.5vw, 15px); line-height: 1.25; letter-spacing: 0.1em; color: #ede6d4; text-align: center; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6); }
+  .headbar .asof { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); margin: 10px 0 0; }
+  .panel .cut-cap { margin-top: 6px; }
   .cut-cap { font-family: var(--f-body); font-style: italic; font-size: 9.5px; color: var(--soft); margin: 5px 0 0; }
 
   /* ── TICKER ── */
@@ -151,7 +153,7 @@ body:has(.cx) { background: #17130f; }
   .chartbox h5 { font-size: 8px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #c9c0a8; margin: 0 0 8px; }
   .chartbox svg { width: 100%; height: auto; display: block; overflow: visible; }
   .chartbox svg text { font-family: var(--f-mono); }
-  .spark { fill: none; stroke: #5fbf63; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1400; stroke-dashoffset: 1400; }
+  .spark { fill: none; stroke: #5fbf63; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
   .spark.draw { animation: cx-draw 2.1s cubic-bezier(0.3, 0.7, 0.3, 1) forwards; }
   .area { fill: rgba(95, 191, 99, 0.12); opacity: 0; transition: opacity 0.6s 0.9s; }
   .area.draw { opacity: 1; }

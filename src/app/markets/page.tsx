@@ -2,72 +2,83 @@ import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ExchangeMotion } from "@/components/ExchangeMotion";
+import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural } from "@/lib/stats";
 import "@/styles/exchange.css";
 
 export const metadata: Metadata = {
   title: "The Coding Exchange",
   description:
-    "Ankit Sinha's competitive-programming practice — LeetCode streak and difficulty split, Codeforces rating, set as the markets page of The Ankit Times.",
+    "Ankit Sinha's competitive-programming practice — live LeetCode streak and difficulty split, Codeforces rating, set as the markets page of The Ankit Times.",
   alternates: { canonical: "/markets" },
 };
 
-const TICKER: [string, string, "up" | "dn" | "fl", string][] = [
-  ["LeetCode", "131", "up", "▲"], ["Streak", "64 D", "up", "▲"], ["Submissions", "685", "up", "▲"],
-  ["Codeforces", "655", "fl", "—"], ["Easy", "64", "up", "▲"], ["Medium", "63", "up", "▲"],
-  ["Hard", "4", "dn", "▼"], ["Active Days", "75", "up", "▲"], ["Contests", "1", "fl", "—"],
-  ["Procrastination", "−15%", "dn", "▼"], ["Coffee", "+25%", "up", "▲"],
-];
+// Keep in step with REVALIDATE in src/lib/stats/config.ts (must be a literal here).
+export const revalidate = 3600;
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+type Tick = [string, string, "up" | "dn" | "fl", string];
 
-/**
- * Six months of practice as 26 weeks × 7 days. Seeded, so server and
- * client render the same cells: quiet, then the 64-day summer run,
- * then tapering.
- */
-function heatCells() {
-  const total = 26 * 7;
-  let seed = 11;
-  const rnd = () => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  };
-  const cells: { n: number; lvl: number; d: string }[] = [];
-  for (let i = 0; i < total; i++) {
-    const d = new Date(2026, 8, 18);
-    d.setDate(d.getDate() - (total - 1 - i));
-    let n = 0;
-    if (i > 78 && i < 146) n = 1 + Math.floor(rnd() * 14);
-    else if (i >= 146) n = rnd() > 0.55 ? 1 + Math.floor(rnd() * 9) : 0;
-    else if (rnd() > 0.93) n = 1 + Math.floor(rnd() * 3);
-    const lvl = n === 0 ? 0 : n > 20 ? 4 : n > 10 ? 3 : n > 4 ? 2 : 1;
-    cells.push({ n, lvl, d: `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}` });
-  }
-  return cells;
+/** ▲ when the last 30 days beat the 30 before, ▼ when they fell short. */
+function trend(now: number, before: number): ["up" | "dn" | "fl", string] {
+  if (now > before) return ["up", "▲"];
+  if (now < before) return ["dn", "▼"];
+  return ["fl", "—"];
 }
 
-const LADDER: [string, string, string, string?][] = [
-  ["Master", "2100+", "#B8453A"],
-  ["Candidate Master", "1900", "#8E5BC6"],
-  ["Expert", "1600", "#4E7BD6"],
-  ["Specialist", "1400", "#34A6A6"],
-  ["Pupil", "1200", "#4E9A51", "next"],
-  ["Newbie · you are here", "655", "#8C8375", "here"],
-];
+/** Weekly volume as chart geometry inside the 520×190 plot: x 40→510, y 155 (zero) → 20. */
+function volumeChart(weekly: number[]) {
+  const peak = Math.max(...weekly);
+  const top = Math.max(15, Math.ceil(peak / 15) * 15);
+  const x = (i: number) => 40 + (i * 470) / (weekly.length - 1);
+  const y = (v: number) => 155 - (v / top) * 135;
+  const line = weekly.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const peakIndex = weekly.indexOf(peak);
+  return {
+    line,
+    area: `${line} L510,155 L40,155 Z`,
+    ticks: [top, (top * 2) / 3, top / 3, 0].map((v) => ({ v: Math.round(v), y: y(v) })),
+    peak: { x: x(peakIndex), y: y(peak), v: peak },
+  };
+}
 
-const SPARK =
-  "M40,155 L70,153 L100,154 L130,152 L160,153 L190,151 L220,150 L250,120 L280,62 L310,28 L340,70 L370,96 L400,88 L430,118 L460,134 L490,142 L510,148";
+export default async function MarketsPage() {
+  const s = await getStats();
+  const { lc, cf } = s;
+  const contest = lc.contest;
 
-export default function MarketsPage() {
-  const tickerRow = TICKER.map(([name, v, cls, arrow]) => (
+  const [subCls, subArrow] = trend(lc.sub30, lc.subPrev30);
+  const [actCls, actArrow] = trend(lc.act30, lc.actPrev30);
+  const cfMove = cf.lastChange ?? 0;
+  const ticker: Tick[] = [
+    ["LeetCode", num(lc.solved), lc.sub7 > 0 ? "up" : "fl", lc.sub7 > 0 ? "▲" : "—"],
+    ["Streak", `${lc.currentStreak} D`, lc.currentStreak > 0 ? "up" : "dn", lc.currentStreak > 0 ? "▲" : "▼"],
+    ["Submissions", num(lc.sub365), subCls, subArrow],
+    ["Codeforces", num(cf.rating), cfMove > 0 ? "up" : cfMove < 0 ? "dn" : "fl", cfMove > 0 ? "▲" : cfMove < 0 ? "▼" : "—"],
+    ["Easy", num(lc.easy), "fl", "·"],
+    ["Medium", num(lc.medium), "fl", "·"],
+    ["Hard", num(lc.hard), "fl", "·"],
+    ["Active Days", num(lc.act365), actCls, actArrow],
+    ["Contests", num(cf.rounds + (contest?.attended ?? 0)), "fl", "—"],
+    ["Procrastination", "−15%", "dn", "▼"],
+    ["Coffee", "+25%", "up", "▲"],
+  ];
+  const tickerRow = ticker.map(([name, v, cls, arrow]) => (
     <span className="tick-item" key={name}>
       {name} <span className={`v ${cls}`}>{v}</span> <span className={cls}>{arrow}</span>
     </span>
   ));
 
+  const maxDiff = Math.max(lc.easy, lc.medium, lc.hard, 1);
+  const chart = volumeChart(s.weekly);
+  const summary: [string, number, number, number, number][] = [
+    ["LeetCode submissions", lc.sub365, lc.sub7, lc.sub30, lc.sub365],
+    ["Active days", lc.act365, lc.act7, lc.act30, lc.act365],
+    ["Codeforces rating", cf.rating, cf.w7.change, cf.w30.change, cf.w365.change],
+    ["Codeforces rounds", cf.rounds, cf.w7.rounds, cf.w30.rounds, cf.w365.rounds],
+    ["Codeforces submissions", cf.subs365, cf.subs7, cf.subs30, cf.subs365],
+  ];
+
   return (
     <div className="cx">
-      {/* ══ SHEET ══ */}
       <main className="stage">
         <div className="sheet">
           {/* masthead */}
@@ -77,7 +88,7 @@ export default function MarketsPage() {
             <div className="side r">
               Patna, India
               <br />
-              Sep 18, 2026
+              {s.dateline}
             </div>
           </div>
           <hr className="rule-thick" />
@@ -90,6 +101,11 @@ export default function MarketsPage() {
                 Exchange
               </h2>
               <p className="dek">Tracking progress in a volatile, rewarding market.</p>
+              <p className="asof">
+                {s.isFallback
+                  ? `Last known figures, ${s.asOfLabel} — live feed unavailable`
+                  : `Live · refreshed hourly · ${s.asOfLabel}`}
+              </p>
             </div>
             <div>
               <p className="pull">
@@ -113,7 +129,7 @@ export default function MarketsPage() {
           </div>
 
           {/* ══ TICKER ══ */}
-          <div className="ticker" aria-label="Live practice ticker">
+          <div className="ticker" aria-label="Practice ticker">
             <div className="tick-track">
               {tickerRow}
               <span style={{ display: "contents" }} aria-hidden="true">
@@ -140,50 +156,76 @@ export default function MarketsPage() {
               <div className="stats">
                 <div className="stat">
                   <span className="lbl">Solved</span>
-                  <div className="big" data-count="131">131</div>
-                  <p className="note up">▲ Easy 64 · Med 63</p>
+                  <div className="big" data-count={lc.solved}>{num(lc.solved)}</div>
+                  <p className="note up">▲ Easy {lc.easy} · Med {lc.medium}</p>
                 </div>
                 <div className="stat">
                   <span className="lbl"><i />Max Streak</span>
-                  <div className="big"><span data-count="64">64</span> Days</div>
-                  <p className="note">75 active days, 1 yr</p>
+                  <div className="big"><span data-count={lc.maxStreak}>{lc.maxStreak}</span> Days</div>
+                  <p className="note">{lc.activeDays} active days, 1 yr</p>
                 </div>
                 <div className="stat">
                   <span className="lbl">Contest</span>
-                  <div className="big">Top <span data-count="29.13" data-dec="2">29.13</span>%</div>
-                  <p className="note">1 rated round</p>
+                  {contest ? (
+                    <>
+                      <div className="big">
+                        Top <span data-count={contest.topPercent} data-dec="2">{contest.topPercent.toFixed(2)}</span>%
+                      </div>
+                      <p className="note">{plural(contest.attended, "rated round")}</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="big">—</div>
+                      <p className="note">No rated round yet</p>
+                    </>
+                  )}
                 </div>
               </div>
 
               <h4 className="sub-h">Problem Distribution</h4>
               <div className="dist">
-                <div className="dist-row"><span>Easy</span><span className="track"><i className="fill" style={{ background: "var(--lc-easy)" }} data-w="100" /></span><span className="n">64</span></div>
-                <div className="dist-row"><span>Medium</span><span className="track"><i className="fill" style={{ background: "var(--lc-med)" }} data-w="98" /></span><span className="n">63</span></div>
-                <div className="dist-row"><span>Hard</span><span className="track"><i className="fill" style={{ background: "var(--lc-hard)" }} data-w="6" /></span><span className="n">4</span></div>
+                {(
+                  [
+                    ["Easy", lc.easy, "var(--lc-easy)"],
+                    ["Medium", lc.medium, "var(--lc-med)"],
+                    ["Hard", lc.hard, "var(--lc-hard)"],
+                  ] as const
+                ).map(([label, n, color]) => (
+                  <div className="dist-row" key={label}>
+                    <span>{label}</span>
+                    <span className="track">
+                      <i className="fill" style={{ background: color }} data-w={Math.round((n / maxDiff) * 100)} />
+                    </span>
+                    <span className="n">{n}</span>
+                  </div>
+                ))}
               </div>
 
               <h4 className="sub-h">Activity (Last 6 Months)</h4>
               <div className="heat" id="heat">
-                {heatCells().map((c, i) => (
+                {lc.heat.map((c, i) => (
                   <i key={i} className={c.lvl ? `l${c.lvl}` : undefined} data-n={c.n} data-d={c.d} />
                 ))}
               </div>
               <div className="heat-months">
-                <span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span><span>AUG</span><span>SEP</span>
+                {lc.heatMonths.map((m, i) => (
+                  <span key={i}>{m}</span>
+                ))}
               </div>
 
               <h4 className="sub-h">Trailing Twelve Months</h4>
               <table className="mini">
                 <thead><tr><th>Metric</th><th className="r">Value</th><th className="r">Note</th></tr></thead>
                 <tbody>
-                  <tr><td>Submissions</td><td className="r">685</td><td className="r ok">▲</td></tr>
-                  <tr><td>Active days</td><td className="r">75</td><td className="r ok">▲</td></tr>
-                  <tr><td>Longest streak</td><td className="r">64</td><td className="r ok">▲</td></tr>
-                  <tr><td>Hard solved</td><td className="r">4</td><td className="r no">▼</td></tr>
-                  <tr><td>Badge</td><td className="r">50 Days</td><td className="r f">2026</td></tr>
+                  <tr><td>Submissions</td><td className="r">{num(lc.sub365)}</td><td className={`r ${subCls === "dn" ? "no" : "ok"}`}>{subArrow}</td></tr>
+                  <tr><td>Active days</td><td className="r">{lc.act365}</td><td className={`r ${actCls === "dn" ? "no" : "ok"}`}>{actArrow}</td></tr>
+                  <tr><td>Longest streak</td><td className="r">{lc.maxStreak}</td><td className="r f">best</td></tr>
+                  <tr><td>Current streak</td><td className="r">{lc.currentStreak}</td><td className="r f">live</td></tr>
+                  <tr><td>Hard solved</td><td className="r">{lc.hard}</td><td className="r f">of {num(lc.totals.hard)}</td></tr>
                 </tbody>
               </table>
-              <a className="view" href="https://leetcode.com/u/Haunts_01/" target="_blank" rel="noopener noreferrer">
+              <p className="cut-cap">Arrows compare the last 30 days with the 30 before.</p>
+              <a className="view" href={LEETCODE_URL} target="_blank" rel="noopener noreferrer">
                 View Profile ↗
               </a>
             </section>
@@ -204,70 +246,85 @@ export default function MarketsPage() {
               <div className="stats">
                 <div className="stat">
                   <span className="lbl">Current Rating</span>
-                  <div className="big" data-count="655">655</div>
-                  <p className="note">1 rated round</p>
+                  <div className="big" data-count={cf.rating}>{num(cf.rating)}</div>
+                  <p className="note">{plural(cf.rounds, "rated round")}</p>
                 </div>
                 <div className="stat">
                   <span className="lbl"><i />Max Rating</span>
-                  <div className="big" data-count="655">655</div>
-                  <p className="note">(Feb 2026)</p>
+                  <div className="big" data-count={cf.maxRating}>{num(cf.maxRating)}</div>
+                  <p className="note">({cf.maxRatingMonth})</p>
                 </div>
                 <div className="stat">
                   <span className="lbl">Rank</span>
-                  <div className="big word">Newbie</div>
-                  <p className="note">Climbing <span className="spec">→ Pupil</span></p>
+                  <div className="big word">{cf.rank}</div>
+                  {cf.nextRank && (
+                    <p className="note">Climbing <span className="spec">→ {cf.nextRank}</span></p>
+                  )}
                 </div>
               </div>
 
               <div className="chartbox">
-                <h5>Practice Volume — Trailing 12 Months</h5>
+                <h5>Practice Volume — Weekly, Trailing 12 Months</h5>
                 <svg
                   viewBox="0 0 520 190"
                   role="img"
-                  aria-label="Daily submission volume over twelve months: near flat until June, then a sustained sixty-four day run through July and August"
+                  aria-label={`Weekly submissions across LeetCode and Codeforces over the last twelve months, peaking at ${chart.peak.v} in one week`}
                 >
                   <g stroke="#2C2820" strokeWidth="1">
-                    <line x1="40" y1="20" x2="510" y2="20" /><line x1="40" y1="65" x2="510" y2="65" />
-                    <line x1="40" y1="110" x2="510" y2="110" /><line x1="40" y1="155" x2="510" y2="155" />
+                    {chart.ticks.map((t) => (
+                      <line key={t.v} x1="40" y1={t.y} x2="510" y2={t.y} />
+                    ))}
                   </g>
                   <g fontSize="8.5" fill="#8C8375" textAnchor="end">
-                    <text x="34" y="23">40</text><text x="34" y="68">30</text><text x="34" y="113">15</text><text x="34" y="158">0</text>
+                    {chart.ticks.map((t) => (
+                      <text key={t.v} x="34" y={t.y + 3}>{t.v}</text>
+                    ))}
                   </g>
-                  <path id="area" className="area" d={`${SPARK} L510,155 L40,155 Z`} />
-                  <path id="spark" className="spark" d={SPARK} />
+                  <path id="area" className="area" d={chart.area} />
+                  <path id="spark" className="spark" d={chart.line} pathLength={1} />
                   <g id="peak" className="peak">
-                    <circle cx="310" cy="28" r="4" fill="#5FBF63" />
-                    <line x1="310" y1="34" x2="310" y2="60" stroke="#5FBF63" strokeWidth="1" strokeDasharray="2 2" />
-                    <text x="310" y="20" fontSize="8.5" fill="#E7DFCA" textAnchor="middle">42 · peak day</text>
+                    <circle cx={chart.peak.x} cy={chart.peak.y} r="4" fill="#5FBF63" />
+                    <text
+                      x={Math.min(Math.max(chart.peak.x, 70), 480)}
+                      y={chart.peak.y - 9}
+                      fontSize="8.5"
+                      fill="#E7DFCA"
+                      textAnchor="middle"
+                    >
+                      {chart.peak.v} · peak week
+                    </text>
                   </g>
                   <g fontSize="8.5" fill="#8C8375">
-                    <text x="40" y="175">SEP &rsquo;25</text>
-                    <text x="265" y="175" textAnchor="middle">JUN</text>
-                    <text x="510" y="175" textAnchor="end">SEP &rsquo;26</text>
+                    <text x="40" y="175">{s.weeklyLabels.start}</text>
+                    <text x="275" y="175" textAnchor="middle">{s.weeklyLabels.mid}</text>
+                    <text x="510" y="175" textAnchor="end">{s.weeklyLabels.end}</text>
                   </g>
                 </svg>
               </div>
 
               <h4 className="sub-h">Contest Stats</h4>
               <div className="stats open">
-                <div className="stat"><span className="lbl">Rounds</span><div className="big sm">1</div></div>
-                <div className="stat"><span className="lbl">Global Rank</span><div className="big sm">254,081</div></div>
-                <div className="stat"><span className="lbl">Field</span><div className="big sm">883,546</div></div>
+                <div className="stat"><span className="lbl">Rounds</span><div className="big sm">{cf.rounds}</div></div>
+                <div className="stat"><span className="lbl">Best Rank</span><div className="big sm">{cf.bestRank ? num(cf.bestRank) : "—"}</div></div>
+                <div className="stat">
+                  <span className="lbl">Last Change</span>
+                  <div className="big sm">{cf.lastChange === null ? "—" : `${cf.lastChange > 0 ? "+" : ""}${cf.lastChange}`}</div>
+                </div>
               </div>
               <h4 className="sub-h">Rank Ladder</h4>
               <div className="ladder">
-                {LADDER.map(([name, rating, color, mod]) => (
+                {cf.ladder.map((r) => (
                   <div
-                    key={name}
-                    className={mod ? `lad ${mod}` : "lad"}
-                    style={{ "--c": color } as CSSProperties}
+                    key={r.name}
+                    className={r.mod ? `lad ${r.mod}` : "lad"}
+                    style={{ "--c": r.color } as CSSProperties}
                   >
-                    <span>{name}</span>
-                    <b>{rating}</b>
+                    <span>{r.name}</span>
+                    <b>{r.value}</b>
                   </div>
                 ))}
               </div>
-              <a className="view" href="https://codeforces.com/profile/Haunts" target="_blank" rel="noopener noreferrer">
+              <a className="view" href={CODEFORCES_URL} target="_blank" rel="noopener noreferrer">
                 View Profile ↗
               </a>
             </section>
@@ -315,14 +372,21 @@ export default function MarketsPage() {
               <table className="summary">
                 <thead><tr><th>Asset</th><th>Value</th><th>1W</th><th>1M</th><th>1Y</th></tr></thead>
                 <tbody>
-                  <tr><td>LeetCode solved</td><td>131</td><td className="u">▲ 9</td><td className="u">▲ 38</td><td className="u">▲ 131</td></tr>
-                  <tr><td>Submissions</td><td>685</td><td className="u">▲ 31</td><td className="u">▲ 96</td><td className="u">▲ 685</td></tr>
-                  <tr><td>Codeforces</td><td>655</td><td className="f">—</td><td className="f">—</td><td className="u">▲ 655</td></tr>
-                  <tr><td>Max streak</td><td>64</td><td className="f">—</td><td className="u">▲ 14</td><td className="u">▲ 64</td></tr>
-                  <tr><td>Hard solved</td><td>4</td><td className="f">—</td><td className="u">▲ 1</td><td className="u">▲ 4</td></tr>
+                  {summary.map(([label, value, ...windows]) => (
+                    <tr key={label}>
+                      <td>{label}</td>
+                      <td>{num(value)}</td>
+                      {windows.map((w, i) => {
+                        const d = delta(w);
+                        return <td key={i} className={d.cls}>{d.text}</td>;
+                      })}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
-              <p className="cut-cap">Deltas are since first rated activity. Nothing here is annualised.</p>
+              <p className="cut-cap">
+                Windows are the trailing 7, 30 and 365 days; rating columns show the change over each.
+              </p>
             </div>
 
             <div className="quote-box">

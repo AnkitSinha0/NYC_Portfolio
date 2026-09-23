@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { MarketReport } from "@/components/MarketReport";
+import { getStats } from "@/lib/stats";
 import "@/styles/edition.css";
 
 const BARCODE = [2, 1, 3, 1, 2, 1, 1, 3, 2, 1, 2, 3, 1, 1, 2, 3, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 3, 1, 2, 2, 1, 3];
@@ -14,16 +16,12 @@ const SPECS: [string, number][] = [
   ["Security / Auth", 84],
 ];
 
-// Trailing-twelve-month daily submissions, as [x, y, height] bars.
-const YEAR_BARS: [number, number, number][] = [
-  [150, 49, 3], [156, 47, 5], [162, 44, 8], [168, 38, 14], [174, 30, 22], [180, 20, 32],
-  [186, 12, 40], [192, 8, 44], [198, 16, 36], [204, 22, 30], [210, 18, 34], [216, 26, 26],
-  [222, 32, 20], [228, 28, 24], [234, 36, 16], [240, 40, 12], [246, 34, 18], [252, 42, 10],
-  [258, 38, 14], [264, 44, 8], [270, 41, 11], [276, 46, 6], [282, 43, 9], [288, 47, 5],
-  [294, 45, 7], [300, 48, 4], [306, 46, 6], [312, 49, 3],
-];
+// Keep in step with REVALIDATE in src/lib/stats/config.ts (must be a literal here).
+export const revalidate = 3600;
 
-export default function Home() {
+export default async function Home() {
+  const stats = await getStats();
+
   return (
     <div className="se">
       <div className="edition">
@@ -240,105 +238,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ═══════ 3 · MARKET REPORT ═══════ */}
-        <div className="pad market" id="market">
-          <div className="sec-break"><span>Market Report · Page 3</span></div>
-          <div className="market-head">
-            <h2>Practice Volume Holds After Summer Run</h2>
-            <span className="stamp">Close of 17 Sept 2026 · Figures from LeetCode &amp; Codeforces</span>
-          </div>
-          <hr className="rule" />
-
-          <div className="market-grid">
-            <div className="summary">
-              <p className="lede">
-                <b>PRACTICE VOLUME CLIMBED SHARPLY</b> through the third quarter as a
-                sixty-four-day consecutive-session position was opened in July and carried,
-                substantially intact, into September. Submissions totalled <b>685</b> across the
-                trailing twelve months against <b>75</b> active sessions — a concentration that
-                favours sustained runs over scattered activity, and the single most defensible
-                figure on this page.
-              </p>
-              <p>
-                The difficulty book has rebalanced. Medium (63) has all but closed its gap to Easy
-                (64), a shift that historically precedes a rating move. Hard remains materially
-                underweight at 4 of 975 available, and is the obvious place to deploy next quarter.
-              </p>
-              <p>
-                Contest exposure stays thin. One rated round on each venue leaves both ratings
-                provisional: LeetCode opened at <b>1,569</b>, placing in the top 29.13% of 883,546;
-                Codeforces sits at <b>655</b>, inside the Newbie band. Neither number carries a
-                trend yet, and this page declines to imply one.
-              </p>
-              <p className="agate-note">
-                Analysis reflects the position as reported by each venue at close. Ratings from a
-                single rated round are not annualised.
-              </p>
-              <Link className="more" href="/markets">Full report: The Coding Exchange →</Link>
-            </div>
-
-            <div>
-              <table className="agate">
-                <caption>Contest Ratings</caption>
-                <thead>
-                  <tr><th>Venue</th><th>Sym</th><th>Last</th><th>High</th><th>Rnds</th><th>Pctl</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>LeetCode</td><td>LCR</td><td>1,569</td><td>1,569</td><td>1</td><td className="chg-up">29.13</td></tr>
-                  <tr><td>Codeforces</td><td>CFR</td><td>655</td><td>655</td><td>1</td><td>NEWB</td></tr>
-                  <tr>
-                    <td className="dim">AtCoder</td><td className="dim">ATC</td><td className="dim">—</td>
-                    <td className="dim">—</td><td className="dim">0</td><td className="dim">UNQT</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p className="agate-note">UNQT — unquoted; no rated round on the books.</p>
-
-              <table className="agate">
-                <caption>Issues Solved, by Difficulty</caption>
-                <thead>
-                  <tr><th>Issue</th><th>Held</th><th>Avail</th><th>Share</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>Easy</td><td>64</td><td>965</td><td>48.9%</td></tr>
-                  <tr><td>Medium</td><td>63</td><td>2,115</td><td>48.1%</td></tr>
-                  <tr><td>Hard</td><td>4</td><td>975</td><td>3.0%</td></tr>
-                  <tr className="total"><td>Total</td><td>131</td><td>4,055</td><td>100%</td></tr>
-                </tbody>
-              </table>
-
-              <table className="agate">
-                <caption>Most Active Languages</caption>
-                <thead><tr><th>Language</th><th>Solved</th><th>Share</th></tr></thead>
-                <tbody>
-                  <tr><td>Java</td><td>129</td><td>98.5%</td></tr>
-                  <tr><td>Python3</td><td>2</td><td>1.5%</td></tr>
-                </tbody>
-              </table>
-
-              <div className="yearchart">
-                <h5>Trailing 12 Months · Daily Submissions</h5>
-                <svg
-                  viewBox="0 0 320 60"
-                  role="img"
-                  aria-label="Chart of daily submissions over the trailing twelve months: flat until June, then a sustained sixty-four day run through July and August"
-                >
-                  <line x1="0" y1="52" x2="320" y2="52" stroke="#16130F" strokeWidth="1" />
-                  <g fill="#16130F">
-                    {YEAR_BARS.map(([x, y, h]) => (
-                      <rect key={x} x={x} y={y} width="2" height={h} />
-                    ))}
-                  </g>
-                  <g fontSize="6" fill="#6E6858">
-                    <text x="0" y="59">SEP &rsquo;25</text>
-                    <text x="150" y="59">JUN</text>
-                    <text x="298" y="59">SEP &rsquo;26</text>
-                  </g>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* ═══════ 3 · MARKET REPORT — live, see src/lib/stats ═══════ */}
+        <MarketReport stats={stats} />
 
         {/* ═══════ 4 · TECHNICAL SUPPLEMENT — PLATE I ═══════ */}
         <div className="pad" id="plate-1">
@@ -608,7 +509,7 @@ export default function Home() {
               <h5>Subscriptions</h5>
               <p>
                 THE EDITION publishes continuously at <b>ankitsin.in</b>. Market figures refresh
-                daily at 04:00 IST. Back issues on GitHub,{" "}
+                hourly. Back issues on GitHub,{" "}
                 <a href="https://github.com/AnkitSinha0" target="_blank" rel="noopener noreferrer">
                   AnkitSinha0
                 </a>
