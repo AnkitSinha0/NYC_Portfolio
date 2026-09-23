@@ -1,11 +1,9 @@
 import type { LanguageMarket as Market } from "@/lib/languages";
 
-const BLOCKS = 20;
-
 function move(pp: number): { text: string; cls: string } {
-  if (pp > 0) return { text: `▲ +${pp}pp`, cls: "r-up" };
-  if (pp < 0) return { text: `▼ ${pp}pp`, cls: "r-dn" };
-  return { text: "─ 0pp", cls: "r-flat" };
+  if (pp > 0) return { text: `▲ +${pp}`, cls: "r-up" };
+  if (pp < 0) return { text: `▼ ${pp}`, cls: "r-dn" };
+  return { text: "— 0", cls: "r-flat" };
 }
 
 /** Share of 90-day coding activity by language, set as a market board. */
@@ -16,39 +14,31 @@ export function LanguageMarket({ market }: { market: Market }) {
   return (
     <div className="box langs">
       <h5>Language Market</h5>
-      <p className="langs-sub">90-day coding activity</p>
-      <table>
-        <caption className="sr-only">
-          Share of coding activity by language over the last 90 days, and the change in percentage points
-          against the previous 90 days
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Lang</th>
-            <th scope="col" aria-hidden="true" />
-            <th scope="col">Share</th>
-            <th scope="col">90d</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((l) => {
-            const blocks = Math.max(1, Math.round((l.share / top) * BLOCKS));
-            const m = move(l.change);
-            return (
-              <tr key={l.name}>
-                <th scope="row">{l.name.toUpperCase()}</th>
-                <td className="bar" aria-hidden="true">
-                  <span>{"█".repeat(blocks)}</span>
-                </td>
-                <td className="num">{l.share}%</td>
-                <td className={`num ${m.cls}`}>{m.text}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <p className="fine-print">
-        Share = weighted activity (commits ×5, files ×2, lines ×0.1) · change vs the previous 90 days
+      <p className="langs-sub">Share of 90-day coding activity</p>
+
+      <div className="lm-head" aria-hidden="true">
+        <span>Language</span>
+        <span>Share</span>
+        <span>Δ pp</span>
+      </div>
+      <ol className="lm" aria-label="Share of coding activity by language, with change in percentage points against the previous 90 days">
+        {rows.map((l, i) => {
+          const m = move(l.change);
+          return (
+            <li key={l.name}>
+              <span className="lm-name">{l.name}</span>
+              <span className="lm-track" aria-hidden="true">
+                <i style={{ width: `${(l.share / top) * 100}%`, opacity: 1 - i * 0.14 }} />
+              </span>
+              <span className="lm-share">{l.share}%</span>
+              <span className={`lm-move ${m.cls}`}>{m.text}</span>
+            </li>
+          );
+        })}
+      </ol>
+
+      <p className="langs-note">
+        Weighted activity: commits ×5, files ×2, lines ×0.1. Change against the previous 90 days.
       </p>
       <p className={market.source === "github" ? "langs-src live" : "langs-src"}>
         {market.source === "github" ? "● Live from GitHub" : "Sample figures · GitHub feed pending"}

@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ActivityFloor } from "@/components/ActivityFloor";
+import { ContestCalendar } from "@/components/ContestCalendar";
 import { ExchangeMotion } from "@/components/ExchangeMotion";
 import { LanguageMarket } from "@/components/LanguageMarket";
 import { MarketSentiment } from "@/components/MarketSentiment";
 import { getActivity } from "@/lib/activity";
+import { getContests } from "@/lib/contests";
 import { getLanguageMarket } from "@/lib/languages";
 import { marketSentiment } from "@/lib/sentiment";
 import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural } from "@/lib/stats";
@@ -47,7 +49,13 @@ function volumeChart(weekly: number[]) {
 }
 
 export default async function MarketsPage() {
-  const [s, activity, languages] = await Promise.all([getStats(), getActivity(), getLanguageMarket()]);
+  const [s, activity, languages, contests] = await Promise.all([
+    getStats(),
+    getActivity(),
+    getLanguageMarket(),
+    getContests(),
+  ]);
+  const renderedAt = Date.parse(activity.generatedAt);
   const sentiment = marketSentiment(s, activity);
   const { lc, cf } = s;
   const contest = lc.contest;
@@ -377,26 +385,29 @@ export default async function MarketsPage() {
 
           {/* ══ BOTTOM ══ */}
           <div className="bottom">
-            <div className="box">
-              <h5>Market Summary</h5>
-              <table className="summary">
-                <thead><tr><th>Asset</th><th>Value</th><th>1W</th><th>1M</th><th>1Y</th></tr></thead>
-                <tbody>
-                  {summary.map(([label, value, ...windows]) => (
-                    <tr key={label}>
-                      <td>{label}</td>
-                      <td>{num(value)}</td>
-                      {windows.map((w, i) => {
-                        const d = delta(w);
-                        return <td key={i} className={d.cls}>{d.text}</td>;
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="cut-cap">
-                Windows are the trailing 7, 30 and 365 days; rating columns show the change over each.
-              </p>
+            <div className="left-col">
+              <div className="box">
+                <h5>Market Summary</h5>
+                <table className="summary">
+                  <thead><tr><th>Asset</th><th>Value</th><th>1W</th><th>1M</th><th>1Y</th></tr></thead>
+                  <tbody>
+                    {summary.map(([label, value, ...windows]) => (
+                      <tr key={label}>
+                        <td>{label}</td>
+                        <td>{num(value)}</td>
+                        {windows.map((w, i) => {
+                          const d = delta(w);
+                          return <td key={i} className={d.cls}>{d.text}</td>;
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="cut-cap">
+                  Windows are the trailing 7, 30 and 365 days; rating columns show the change over each.
+                </p>
+              </div>
+              <ContestCalendar contests={contests} now={renderedAt} />
             </div>
 
             <div className="mid-col">
