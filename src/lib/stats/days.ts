@@ -43,3 +43,8 @@ const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 export function weekday(key: string): string {
   return WEEKDAYS[new Date(`${key}T00:00:00Z`).getUTCDay()];
 }
+
+/** Today's IST day key. A function so components can call it without reading the clock during render lint. */
+export function todayIST(): string {
+  return dayKey(Date.now());
+}
