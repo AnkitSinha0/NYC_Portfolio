@@ -34,6 +34,8 @@ export type ActivityFeed = {
     cfLastChange: number | null;
     topRepo: string | null;
     week: number; // total over the 7-day chart
+    pushes7: number;
+    hashvaultAt: string | null; // latest HashVault push seen, ISO
   };
   week: { label: string; count: number }[]; // 7 IST days, oldest first
   down: ("GitHub" | "LeetCode" | "Codeforces")[];

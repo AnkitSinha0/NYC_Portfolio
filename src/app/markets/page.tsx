@@ -3,7 +3,9 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ActivityFloor } from "@/components/ActivityFloor";
 import { ExchangeMotion } from "@/components/ExchangeMotion";
+import { MarketSentiment } from "@/components/MarketSentiment";
 import { getActivity } from "@/lib/activity";
+import { marketSentiment } from "@/lib/sentiment";
 import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural } from "@/lib/stats";
 import "@/styles/exchange.css";
 
@@ -44,6 +46,7 @@ function volumeChart(weekly: number[]) {
 
 export default async function MarketsPage() {
   const [s, activity] = await Promise.all([getStats(), getActivity()]);
+  const sentiment = marketSentiment(s, activity);
   const { lc, cf } = s;
   const contest = lc.contest;
 
@@ -400,6 +403,7 @@ export default async function MarketsPage() {
             </div>
 
             <div className="notes-col">
+              <MarketSentiment sentiment={sentiment} />
               <div className="sticky"><p>Progress &gt; Perfection</p></div>
               <div className="sticky b">
                 <p>

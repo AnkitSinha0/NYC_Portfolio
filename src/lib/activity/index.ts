@@ -38,6 +38,8 @@ export async function getActivity(): Promise<ActivityFeed> {
       cfLastChange: cf?.cfLastChange ?? null,
       topRepo: events.find((e) => e.source === "github" || e.source === "project")?.title ?? null,
       week: week.reduce((a, d) => a + d.count, 0),
+      pushes7: gh?.pushes7 ?? 0,
+      hashvaultAt: gh?.hashvaultAt ?? null,
     },
     week,
     down: [!gh && "GitHub", !lc && "LeetCode", !cf && "Codeforces"].filter(Boolean) as ActivityFeed["down"],

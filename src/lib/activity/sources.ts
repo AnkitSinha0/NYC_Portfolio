@@ -12,6 +12,8 @@ export type SourceResult = {
   events: ActivityEvent[];
   daily: Record<string, number>; // IST day -> raw activity count
   pushes24?: number;
+  pushes7?: number;
+  hashvaultAt?: string | null; // ISO of the latest HashVault push, if any in the feed
   prs24?: number;
   repos24?: string[];
   solved24?: number;
@@ -82,6 +84,8 @@ export async function fromGitHub(now: number): Promise<SourceResult> {
     const daily: Record<string, number> = {};
     const since = now - DAY_MS;
     let pushes24 = 0;
+    let pushes7 = 0;
+    let hashvaultAt: string | null = null;
     let prs24 = 0;
     const repos24 = new Set<string>();
 
@@ -94,6 +98,8 @@ export async function fromGitHub(now: number): Promise<SourceResult> {
       const ms = Date.parse(e.created_at);
       if (e.type === "PushEvent") {
         bump(daily, ms);
+        if (ms >= now - 7 * DAY_MS) pushes7++;
+        if (!hashvaultAt && /\/hashvault$/i.test(e.repo.name)) hashvaultAt = e.created_at;
         if (ms >= since) {
           pushes24++;
           repos24.add(e.repo.name);
@@ -175,7 +181,7 @@ export async function fromGitHub(now: number): Promise<SourceResult> {
       }),
     );
 
-    return { events: [...pushEvents, ...others], daily, pushes24, prs24, repos24: [...repos24] };
+    return { events: [...pushEvents, ...others], daily, pushes24, pushes7, hashvaultAt, prs24, repos24: [...repos24] };
   } catch {
     return null;
   }

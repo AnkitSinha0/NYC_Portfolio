@@ -50,7 +50,7 @@ export function mockFeed(now: number): ActivityFeed {
     mode: "demo",
     generatedAt: new Date(now).toISOString(),
     events,
-    summary: { pushes: 6, solved: 4, prs: 2, repos: 3, cfLastChange: 18, topRepo: "HASHVAULT", week: week.reduce((a, d) => a + d.count, 0) },
+    summary: { pushes: 6, solved: 4, prs: 2, repos: 3, cfLastChange: 18, topRepo: "HASHVAULT", week: week.reduce((a, d) => a + d.count, 0), pushes7: 21, hashvaultAt: new Date(now - 11 * 60_000).toISOString() },
     week,
     down: [],
   };

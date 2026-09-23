@@ -326,6 +326,28 @@ body:has(.cx) { background: #17130f; }
   .sticky.b { transform: rotate(0.9deg); }
   .sticky p { font-family: var(--f-hand); font-size: 1.15rem; line-height: 1.15; margin: 0; text-align: center; }
 
+  /* ── market sentiment gauge ── */
+  .sentiment .gauge { font-family: var(--f-mono); font-size: 13px; letter-spacing: -0.5px; line-height: 1; margin: 2px 0 8px; white-space: nowrap; overflow: hidden; }
+  .sentiment .gauge .on { color: var(--soft); }
+  .sentiment.bullish .gauge .on { color: var(--up); }
+  .sentiment.bearish .gauge .on { color: var(--down); }
+  .sentiment .gauge .off { color: var(--hair); }
+  .sentiment .mood { font-family: var(--f-disp); font-weight: 800; font-size: 1.6rem; line-height: 1; letter-spacing: 0.01em; margin: 0; }
+  .sentiment.bullish .mood { color: var(--up); }
+  .sentiment.bearish .mood { color: var(--down); }
+  .sentiment .scale { list-style: none; display: flex; gap: 12px; margin: 6px 0 0; padding: 0 0 8px; border-bottom: 1px solid var(--ink); font-family: var(--f-mono); font-size: 8.5px; letter-spacing: 0.1em; color: var(--hair); }
+  .sentiment .scale .here { color: var(--ink); font-weight: 700; }
+  .sentiment .why { font-size: 8px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin: 9px 0 4px; }
+  .sentiment .reasons { list-style: none; margin: 0; padding: 0; }
+  .sentiment .reasons li { font-family: var(--f-body); font-size: 11.5px; padding: 3px 0; border-bottom: 1px dotted var(--hair); }
+  .sentiment .reasons li:last-child { border-bottom: 0; }
+  .sentiment .reasons b { font-family: var(--f-mono); display: inline-block; width: 12px; }
+  .sentiment .reasons .r-up b { color: var(--up); }
+  .sentiment .reasons .r-dn b { color: var(--down); }
+  .sentiment .reasons .r-flat { color: var(--soft); }
+  .sentiment .analyst { font-family: var(--f-hand); font-size: 1.1rem; line-height: 1.15; margin: 9px 0 6px; }
+  .sentiment .fine-print { font-size: 7.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); margin: 3px 0 0; line-height: 1.5; }
+
   /* ── FOOT ── */
   .sheet-foot { display: flex; align-items: center; gap: 16px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--ink); }
   .sheet-foot .hand { font-size: 1.3rem; white-space: nowrap; }
