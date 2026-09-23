@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { ActivityFloor } from "@/components/ActivityFloor";
 import { ExchangeMotion } from "@/components/ExchangeMotion";
+import { getActivity } from "@/lib/activity";
 import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural } from "@/lib/stats";
 import "@/styles/exchange.css";
 
@@ -41,7 +43,7 @@ function volumeChart(weekly: number[]) {
 }
 
 export default async function MarketsPage() {
-  const s = await getStats();
+  const [s, activity] = await Promise.all([getStats(), getActivity()]);
   const { lc, cf } = s;
   const contest = lc.contest;
 
@@ -365,6 +367,9 @@ export default async function MarketsPage() {
             </div>
           </div>
 
+          {/* ══ DEVELOPER EXCHANGE — live activity tape ══ */}
+          <ActivityFloor initial={activity} />
+
           {/* ══ BOTTOM ══ */}
           <div className="bottom">
             <div className="box">
@@ -395,16 +400,6 @@ export default async function MarketsPage() {
             </div>
 
             <div className="notes-col">
-              <div className="box">
-                <h5>This Month</h5>
-                <ul className="check">
-                  <li className="done"><span className="bx on" />Hold the daily streak</li>
-                  <li className="done"><span className="bx on" />Ship HashVault dedup</li>
-                  <li><span className="bx" />Clear 10 hard problems</li>
-                  <li><span className="bx" />Enter a rated round</li>
-                  <li><span className="bx" />Write one explanation</li>
-                </ul>
-              </div>
               <div className="sticky"><p>Progress &gt; Perfection</p></div>
               <div className="sticky b">
                 <p>

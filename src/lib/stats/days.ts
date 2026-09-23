@@ -28,3 +28,18 @@ export function formatDateline(key: string): string {
 export function monthOf(key: string): string {
   return MONTHS[Number(key.slice(5, 7)) - 1];
 }
+
+/** "HH:MM:SS" on the IST clock. */
+export function timeIST(ms: number): string {
+  return new Date(ms + IST_OFFSET_MS).toISOString().slice(11, 19);
+}
+
+/** "23 Sep 2026 · 22:31 IST" */
+export function stampIST(ms: number): string {
+  return `${formatDay(dayKey(ms))} · ${timeIST(ms).slice(0, 5)} IST`;
+}
+
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+export function weekday(key: string): string {
+  return WEEKDAYS[new Date(`${key}T00:00:00Z`).getUTCDay()];
+}
