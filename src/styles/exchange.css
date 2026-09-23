@@ -348,6 +348,27 @@ body:has(.cx) { background: #17130f; }
   .sentiment .analyst { font-family: var(--f-hand); font-size: 1.1rem; line-height: 1.15; margin: 9px 0 6px; }
   .sentiment .fine-print { font-size: 7.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); margin: 3px 0 0; line-height: 1.5; }
 
+  /* ── language market ── */
+  .mid-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .langs h5 { margin-bottom: 2px; }
+  .langs-sub { font-family: var(--f-body); font-style: italic; font-size: 10.5px; color: var(--soft); margin: 0 0 8px; }
+  .langs table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .langs thead th { font-size: 7.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); text-align: right; padding: 0 0 4px; border-bottom: 1px solid var(--ink); }
+  .langs thead th:first-child { text-align: left; }
+  .langs tbody th, .langs td { padding: 5px 0; border-bottom: 1px dotted var(--hair); white-space: nowrap; }
+  .langs tbody tr:last-child th, .langs tbody tr:last-child td { border-bottom: 0; }
+  .langs tbody th { font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-align: left; padding-right: 8px; }
+  .langs .bar { width: 100%; font-family: var(--f-mono); font-size: 9px; letter-spacing: -0.5px; line-height: 1; color: var(--ink); overflow: hidden; max-width: 0; }
+  .langs .bar span { display: block; overflow: hidden; }
+  .langs .num { font-family: var(--f-mono); font-size: 10px; text-align: right; padding-left: 8px; }
+  .langs .r-up { color: var(--up); font-weight: 700; }
+  .langs .r-dn { color: var(--down); font-weight: 700; }
+  .langs .r-flat { color: var(--soft); }
+  .langs .fine-print { font-size: 7.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft); margin: 8px 0 0; line-height: 1.5; }
+  .langs-src { text-align: center; font-family: var(--f-mono); font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin: 8px 0 0; padding-top: 7px; border-top: 1px solid var(--ink); }
+  .langs-src.live { color: var(--up); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
   /* ── FOOT ── */
   .sheet-foot { display: flex; align-items: center; gap: 16px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--ink); }
   .sheet-foot .hand { font-size: 1.3rem; white-space: nowrap; }

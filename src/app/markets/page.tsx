@@ -3,8 +3,10 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ActivityFloor } from "@/components/ActivityFloor";
 import { ExchangeMotion } from "@/components/ExchangeMotion";
+import { LanguageMarket } from "@/components/LanguageMarket";
 import { MarketSentiment } from "@/components/MarketSentiment";
 import { getActivity } from "@/lib/activity";
+import { getLanguageMarket } from "@/lib/languages";
 import { marketSentiment } from "@/lib/sentiment";
 import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural } from "@/lib/stats";
 import "@/styles/exchange.css";
@@ -45,7 +47,7 @@ function volumeChart(weekly: number[]) {
 }
 
 export default async function MarketsPage() {
-  const [s, activity] = await Promise.all([getStats(), getActivity()]);
+  const [s, activity, languages] = await Promise.all([getStats(), getActivity(), getLanguageMarket()]);
   const sentiment = marketSentiment(s, activity);
   const { lc, cf } = s;
   const contest = lc.contest;
@@ -397,9 +399,12 @@ export default async function MarketsPage() {
               </p>
             </div>
 
-            <div className="quote-box">
-              <p>&ldquo;The market rewards those who show up.&rdquo;</p>
-              <span className="sig">Ankit Sinha</span>
+            <div className="mid-col">
+              <LanguageMarket market={languages} />
+              <div className="quote-box">
+                <p>&ldquo;The market rewards those who show up.&rdquo;</p>
+                <span className="sig">Ankit Sinha</span>
+              </div>
             </div>
 
             <div className="notes-col">
