@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-tone="aged" className={`${fontVariables} h-full`}>
-      <body className="min-h-full flex flex-col">
+    <html lang="en" className={fontVariables}>
+      <body>
         {children}
         <script
           type="application/ld+json"

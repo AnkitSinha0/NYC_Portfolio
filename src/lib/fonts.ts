@@ -19,6 +19,7 @@ export const nameplate = UnifrakturMaguntia({
 // Display / headlines
 export const display = Playfair_Display({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
@@ -26,6 +27,7 @@ export const display = Playfair_Display({
 // Body copy
 export const body = Source_Serif_4({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   variable: "--font-body",
   display: "swap",
 });
@@ -39,7 +41,7 @@ export const utility = Libre_Franklin({
 
 // Condensed display — section openers, big figures, the F1 headline
 export const condensed = Archivo_Narrow({
-  weight: ["600", "700"],
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-condensed",
   display: "swap",
