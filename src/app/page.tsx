@@ -276,7 +276,7 @@ export default async function Home() {
         <section className="pad terminal-sec" id="terminal" aria-labelledby="term-hed">
           <div className="sec-head">
             <h2 id="term-hed">The Terminal</h2>
-            <span>Click in and type <code>help</code> · ↑ history · Tab completes</span>
+            <span className="term-hint">interactive · type help</span>
           </div>
           <Terminal
             stats={{
@@ -285,6 +285,7 @@ export default async function Home() {
               cfRating: cf.rating,
               cfRank: cf.rank,
               streak: lc.currentStreak,
+              total: lc.totals.easy + lc.totals.medium + lc.totals.hard,
             }}
           />
         </section>

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LINKS, PROJECTS, REPORTS, STACK } from "@/lib/content";
+import { PORTRAIT_ASCII } from "./portraitAscii";
 
 export type TerminalStats = {
   solved: number;
@@ -10,11 +11,24 @@ export type TerminalStats = {
   cfRating: number;
   cfRank: string;
   streak: number;
+  total: number; // problems available on LeetCode
 };
 
-const PROMPT = "ankit@ankitsin:~$";
+/** Ubuntu's prompt colours: green user@host, blue path. */
+const PS = (
+  <span className="ps">
+    <b className="p-user">ankit@ankitsin</b>:<b className="p-path">~</b>$
+  </span>
+);
+
+// Ubuntu's Tango palette, the two rows fastfetch prints under its output.
+const TANGO = [
+  ["#2e3436", "#cc0000", "#4e9a06", "#c4a000", "#3465a4", "#75507b", "#06989a", "#d3d7cf"],
+  ["#555753", "#ef2929", "#8ae234", "#fce94f", "#729fcf", "#ad7fa8", "#34e2e2", "#eeeeec"],
+];
 
 const HELP: [string, string][] = [
+  ["fastfetch", "system information"],
   ["about", "who I am"],
   ["stack", "what I build with"],
   ["work", "selected projects"],
@@ -26,8 +40,7 @@ const HELP: [string, string][] = [
   ["github", "GitHub"],
   ["clear", "clear terminal"],
 ];
-const COMMANDS = ["help", ...HELP.map(([c]) => c), "konnect", "linkedin", "open", "whoami", "ls", "date", "sudo"];
-const TRY = ["hashvault", "coding", "writing", "contact"];
+const COMMANDS = ["help", ...HELP.map(([c]) => c), "konnect", "linkedin", "open", "neofetch", "whoami", "ls", "date", "sudo"];
 
 type Line = { id: number; node: ReactNode };
 
@@ -104,11 +117,49 @@ export function Terminal({ stats }: { stats: TerminalStats }) {
     );
   }
 
+  function fastfetch() {
+    const hv = PROJECTS.find((p) => p.slug === "hashvault")!;
+    const done = hv.roadmap?.filter((r) => r.done).length ?? 0;
+    const packages = STACK.reduce((n, d) => n + d.items.length, 0);
+    const rows: [string, string][] = [
+      ["OS", "ankitsin.in · The Edition"],
+      ["Host", "IIT Patna · MCA 2026–28"],
+      ["Kernel", "go1.26 · java 21"],
+      ["Uptime", `${stats.streak} days (LeetCode streak)`],
+      ["Packages", `${packages} (stack)`],
+      ["Shell", "zsh"],
+      ["Terminal", "newsprint-tty"],
+      ["CPU", "Backend engineer @ distributed systems"],
+      ["GPU", "Coffee-accelerated"],
+      ["Memory", `${stats.solved} / ${stats.total.toLocaleString("en-US")} problems (LeetCode)`],
+      ["Codeforces", `${stats.cfRating} · ${stats.cfRank}`],
+      ["Build", `HashVault · ${done}/${hv.roadmap?.length ?? 0} phases`],
+      ["Locale", "en_IN.UTF-8 · Patna"],
+    ];
+    return (
+      <div className="ff">
+        <pre className="ff-art" aria-label="ASCII portrait of Ankit Sinha">{PORTRAIT_ASCII}</pre>
+        <div className="ff-info">
+          <p><b className="p-user">ankit</b>@<b className="p-user">ankitsin</b></p>
+          <p className="ff-rule">{"-".repeat(14)}</p>
+          {rows.map(([k, v]) => (
+            <p key={k}><b className="ff-k">{k}</b>: {v}</p>
+          ))}
+          <div className="ff-colors" aria-hidden="true">
+            {TANGO.map((row, i) => (
+              <p key={i}>{row.map((c) => <i key={c} style={{ background: c }} />)}</p>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   function run(raw: string) {
     const cmd = raw.trim().toLowerCase();
     print(
       <p className="echo">
-        <span className="ps">{PROMPT}</span> {raw}
+        {PS} {raw}
       </p>,
     );
     if (!cmd) return;
@@ -128,6 +179,10 @@ export function Terminal({ stats }: { stats: TerminalStats }) {
             ))}
           </dl>,
         );
+        break;
+      case "fastfetch":
+      case "neofetch":
+        print(fastfetch());
         break;
       case "about":
       case "whoami":
@@ -231,13 +286,17 @@ export function Terminal({ stats }: { stats: TerminalStats }) {
         setLines([]);
         break;
       default:
-        print(<p>command not found: {cmd}. Type {cmdLink("help")}.</p>);
+        print(<p><span className="t-err">zsh: command not found: {cmd}</span> — type {cmdLink("help")}.</p>);
     }
   }
 
   const runRef = useRef(run);
+  const cmdLinkRef = useRef(cmdLink);
+  const printRef = useRef(print);
   useEffect(() => {
     runRef.current = run;
+    cmdLinkRef.current = cmdLink;
+    printRef.current = print;
   });
 
   // The first time the terminal scrolls into view, someone types `help`.
@@ -251,19 +310,21 @@ export function Terminal({ stats }: { stats: TerminalStats }) {
         if (!e.isIntersecting) return;
         io.disconnect();
         if (reduce) {
-          timers.push(window.setTimeout(() => runRef.current("help"), 0));
+          timers.push(window.setTimeout(() => runRef.current("fastfetch"), 0));
           return;
         }
+        const word = "fastfetch";
         setTyping(true);
-        "help".split("").forEach((_, i) => {
-          timers.push(window.setTimeout(() => setInput("help".slice(0, i + 1)), 350 + i * 110));
+        word.split("").forEach((_, i) => {
+          timers.push(window.setTimeout(() => setInput(word.slice(0, i + 1)), 350 + i * 90));
         });
         timers.push(
           window.setTimeout(() => {
             setInput("");
             setTyping(false);
-            runRef.current("help");
-          }, 350 + 4 * 110 + 260),
+            runRef.current(word);
+            printRef.current(<p className="dim">Type {cmdLinkRef.current("help")} to see what else this terminal does.</p>);
+          }, 350 + word.length * 90 + 260),
         );
       },
       { threshold: 0.5 },
@@ -301,7 +362,7 @@ export function Terminal({ stats }: { stats: TerminalStats }) {
       if (match.length === 1) setInput(match[0]);
       else if (match.length > 1)
         print(
-          <p className="echo"><span className="ps">{PROMPT}</span> {input}</p>,
+          <p className="echo">{PS} {input}</p>,
           <p className="dim">{match.join("   ")}</p>,
         );
     } else if (e.key === "l" && e.ctrlKey) {
@@ -324,7 +385,7 @@ export function Terminal({ stats }: { stats: TerminalStats }) {
             <div key={l.id}>{l.node}</div>
           ))}
           <label className="term-input">
-            <span className="ps">{PROMPT}</span>
+            {PS}
             <span className="term-field">
               <input
                 ref={inputRef}
@@ -342,14 +403,6 @@ export function Terminal({ stats }: { stats: TerminalStats }) {
           </label>
         </div>
       </div>
-      <p className="term-try">
-        Try{" "}
-        {TRY.map((c) => (
-          <button key={c} type="button" onClick={() => { run(c); inputRef.current?.focus({ preventScroll: true }); }}>
-            {c}
-          </button>
-        ))}
-      </p>
     </div>
   );
 }
