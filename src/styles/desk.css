@@ -3,7 +3,9 @@
    and The Coding Exchange (.cx). Page wrappers pick a desk:
      (none)         dark grain only — the front page
      .desk-navy     tilted newspaper layouts in navy ink
-     .desk-print    aged newsprint, dimmed so the page stays the subject
+     .desk-bigben   The Times with Big Ben, washed dark
+     .desk-collage  a collage of cut headlines, washed dark
+     .desk-wall     a gritty wall of pasted-up bills
    Images sit on the margin columns, not the body, so they stay
    sharp at any width. See src/lib/desk.ts for which page gets which.
    ═══════════════════════════════════════════════════════════ */
@@ -31,13 +33,17 @@
 @media (min-width: 1580px) { .desk-frag { display: block; } .desk-side { justify-content: flex-start; } .desk-vert { margin-top: 12px; } .desk-side .desk-reg:last-child { margin-top: auto; } }
 
 
-.desk-navy .desk-side, .desk-print .desk-side { background-repeat: no-repeat; background-size: cover; }
+.desk-navy .desk-side, .desk-bigben .desk-side, .desk-collage .desk-side, .desk-wall .desk-side { background-repeat: no-repeat; background-size: cover; }
 .desk-navy .desk-side { background-image: linear-gradient(rgba(10, 12, 24, 0.25), rgba(10, 12, 24, 0.25)), url("/desk/layout-navy.jpg"); color: rgba(214, 222, 240, 0.2); }
 .desk-navy .desk-side.l { background-position: right center; box-shadow: inset -40px 0 60px -20px rgba(0, 0, 0, 0.55); }
 .desk-navy .desk-side.r { background-position: left center; box-shadow: inset 40px 0 60px -20px rgba(0, 0, 0, 0.55); }
 .desk-navy .desk-ticker { color: rgba(214, 222, 240, 0.1); }
-.desk-print .desk-side { background-image: linear-gradient(rgba(24, 18, 10, 0.64), rgba(24, 18, 10, 0.64)), url("/desk/newsprint.jpg"); color: rgba(246, 234, 206, 0.34); }
-.desk-print .desk-side.l { background-position: right center; box-shadow: inset -50px 0 70px -20px rgba(0, 0, 0, 0.6); }
-.desk-print .desk-side.r { background-position: left center; box-shadow: inset 50px 0 70px -20px rgba(0, 0, 0, 0.6); }
-.desk-print .desk-ticker { color: rgba(246, 234, 206, 0.16); }
+/* photographic desks: grayscale newsprint, washed dark so the page stays the brightest thing on screen */
+.desk-bigben .desk-side { background-image: linear-gradient(rgba(16, 14, 12, 0.72), rgba(16, 14, 12, 0.72)), url("/desk/bigben.jpg"); }
+.desk-collage .desk-side { background-image: linear-gradient(rgba(16, 14, 12, 0.74), rgba(16, 14, 12, 0.74)), url("/desk/collage.jpg"); }
+.desk-wall .desk-side { background-image: linear-gradient(rgba(12, 11, 10, 0.4), rgba(12, 11, 10, 0.4)), url("/desk/wall.jpg"); }
+.desk-bigben .desk-side, .desk-collage .desk-side, .desk-wall .desk-side { color: rgba(244, 238, 224, 0.34); }
+.desk-bigben .desk-ticker, .desk-collage .desk-ticker, .desk-wall .desk-ticker { color: rgba(244, 238, 224, 0.16); }
+.desk-bigben .desk-side.l, .desk-collage .desk-side.l, .desk-wall .desk-side.l { background-position: right center; box-shadow: inset -50px 0 70px -20px rgba(0, 0, 0, 0.65); }
+.desk-bigben .desk-side.r, .desk-collage .desk-side.r, .desk-wall .desk-side.r { background-position: left center; box-shadow: inset 50px 0 70px -20px rgba(0, 0, 0, 0.65); }
 body:has(.desk-navy) { background: #1b2033; }
