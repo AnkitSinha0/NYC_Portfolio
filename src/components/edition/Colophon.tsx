@@ -37,7 +37,7 @@ export function Colophon() {
           <line x1="0" y1="9" x2="18" y2="9" stroke="#16130F" strokeWidth=".8" />
         </svg>
         <p className="mark">Ankit Sinha</p>
-        <p>Nameplate in Old Standard. Set in Playfair Display, Source Serif, Libre Franklin, Archivo Narrow and JetBrains Mono.</p>
+        <p>Set in Playfair Display, Source Serif, Libre Franklin, Archivo Narrow and JetBrains Mono.</p>
         <p className="printed">Issue No. 01 · Printed at Patna · ankitsin.in</p>
       </div>
     </footer>

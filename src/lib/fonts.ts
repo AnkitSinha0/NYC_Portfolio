@@ -1,5 +1,6 @@
 import {
   Old_Standard_TT,
+  UnifrakturMaguntia,
   Playfair_Display,
   Source_Serif_4,
   Libre_Franklin,
@@ -8,8 +9,17 @@ import {
   Caveat,
 } from "next/font/google";
 
-// Nameplate — the wordmark only. Never body text. A 19th-century
-// newspaper face: reads as a masthead, reads as a name.
+// Nameplates — the wordmark only. Never body text.
+// Blackletter on every inner page and /markets…
+export const blackletter = UnifrakturMaguntia({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-blackletter",
+  display: "swap",
+});
+
+// …and a 19th-century newspaper face on the front page, where the
+// name has to read at a glance.
 export const nameplate = Old_Standard_TT({
   weight: "700",
   subsets: ["latin"],
@@ -65,6 +75,7 @@ export const hand = Caveat({
 });
 
 export const fontVariables = [
+  blackletter.variable,
   nameplate.variable,
   display.variable,
   body.variable,

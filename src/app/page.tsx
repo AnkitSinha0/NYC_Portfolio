@@ -32,7 +32,7 @@ export default async function Home() {
   const [hashvault, konnect] = PROJECTS;
 
   return (
-    <div className="se">
+    <div className="se home">
       <div className="edition">
         <Masthead active="/" />
 

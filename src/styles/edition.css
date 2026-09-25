@@ -19,7 +19,8 @@ body:has(.se) { background: #211e1a; }
   --bp: #123258; --bp-line: #e8f0ff; --bp-dim: rgba(232, 240, 255, 0.3); --bp-edge: #efe9d8;
   --plate: #e9e2cf; --plate-ink: #3b3226; --plate-hair: #b9ae93;
 
-  --f-name: var(--font-nameplate), Georgia, serif;
+  /* nameplate: blackletter everywhere except the front page (.home) */
+  --f-name: var(--font-blackletter), Georgia, serif; --name-weight: 400;
   --f-disp: var(--font-display), Georgia, serif;
   --f-body: var(--font-body), Georgia, serif;
   --f-util: var(--font-utility), -apple-system, sans-serif;
@@ -29,6 +30,9 @@ body:has(.se) { background: #211e1a; }
   min-height: 100vh;
   background: var(--desk); color: var(--ink);
   font-family: var(--f-util); -webkit-font-smoothing: antialiased;
+
+  &.home { --f-name: var(--font-nameplate), Georgia, serif; --name-weight: 700; }
+  &.home .nameplate { letter-spacing: -0.01em; }
 
   & *, & *::before, & *::after { box-sizing: border-box; }
   & ::selection { background: var(--red); color: var(--paper); }
@@ -76,7 +80,7 @@ body:has(.se) { background: #211e1a; }
   /* ═══ MASTHEAD ═══ */
   .masthead-se { padding-top: 20px; }
   .folio { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--soft); padding: 8px 0; }
-  .nameplate { font-family: var(--f-name); font-weight: 700; font-size: clamp(2.5rem, 8vw, 5.2rem); line-height: 1; letter-spacing: -0.01em; text-align: center; margin: 12px 0 14px; }
+  .nameplate { font-family: var(--f-name); font-weight: var(--name-weight); font-size: clamp(2.5rem, 8vw, 5.2rem); line-height: 1; text-align: center; margin: 12px 0 14px; }
   .secnav { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 24px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 10px 0; }
   .secnav a { padding-bottom: 2px; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
   .secnav a:hover { color: var(--red); }
@@ -257,7 +261,7 @@ body:has(.se) { background: #211e1a; }
   .directory dd { margin: 0; font-family: var(--f-body); font-size: 14px; }
   .directory a:hover { color: var(--red); }
   .colophon { text-align: center; padding: 22px 0 32px; }
-  .colophon .mark { font-family: var(--f-name); font-weight: 700; font-size: 1.6rem; margin: 0 0 6px; }
+  .colophon .mark { font-family: var(--f-name); font-weight: var(--name-weight); font-size: 1.6rem; margin: 0 0 6px; }
   .colophon p { font-family: var(--f-body); font-size: 11px; color: var(--soft); margin: 0 0 4px; }
   .colophon .printed { margin-top: 8px; }
   .regmark { display: inline-block; width: 18px; height: 18px; opacity: 0.5; }

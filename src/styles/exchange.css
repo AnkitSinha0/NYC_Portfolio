@@ -21,7 +21,7 @@ body:has(.cx) { background: #17130f; }
   --up: #3f7f43; --down: #b8453a; --gold: #b8862f;
   --lc-easy: #3f7f43; --lc-med: #c08a2a; --lc-hard: #b8453a;
 
-  --f-name: var(--font-nameplate), Georgia, serif;
+  --f-name: var(--font-blackletter), Georgia, serif;
   --f-disp: var(--font-display), Georgia, serif;
   --f-body: var(--font-body), Georgia, serif;
   --f-util: var(--font-utility), -apple-system, sans-serif;
@@ -65,7 +65,7 @@ body:has(.cx) { background: #17130f; }
   .masthead { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; padding-bottom: 8px; }
   .masthead .side { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.14em; line-height: 1.8; text-transform: uppercase; color: var(--soft); }
   .masthead .side.r { text-align: right; }
-  .masthead h1 { font-family: var(--f-name); font-weight: 700; font-size: clamp(1.7rem, 4.4vw, 3rem); margin: 0; text-align: center; line-height: 1; }
+  .masthead h1 { font-family: var(--f-name); font-weight: 400; font-size: clamp(1.7rem, 4.4vw, 3rem); margin: 0; text-align: center; line-height: 1; }
   .masthead h1 a { color: inherit; text-decoration: none; }
 
   .headbar { display: grid; grid-template-columns: 1.85fr 0.8fr 0.85fr; gap: 18px; align-items: start; padding: 12px 0 14px; }
