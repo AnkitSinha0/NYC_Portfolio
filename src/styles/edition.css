@@ -6,11 +6,12 @@
    as decoration. Scoped under .se so it never collides with The
    Coding Exchange (/markets), which keeps its own trading-desk look.
    ═══════════════════════════════════════════════════════════ */
-body:has(.se) { background: #211e1a; }
+body:has(.se) { background: #1d1a16; }
 
 @keyframes se-rise { from { opacity: 0.15; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes se-flow { to { stroke-dashoffset: -28; } }
 @keyframes se-blink { 50% { opacity: 0.2; } }
+@keyframes se-desk { to { transform: translateY(-50%); } }
 
 .se {
   --desk: #211e1a;
@@ -28,7 +29,14 @@ body:has(.se) { background: #211e1a; }
   --f-mono: var(--font-mono), monospace;
 
   min-height: 100vh;
-  background: var(--desk); color: var(--ink);
+  /* the desk: fine grain, a vignette and faint ruled lines on dark wood-paper */
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 35%, transparent 30%, rgba(0, 0, 0, 0.5) 100%),
+    repeating-linear-gradient(0deg, rgba(231, 223, 202, 0.022) 0 1px, transparent 1px 9px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .92 0 0 0 0 .88 0 0 0 0 .8 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    var(--desk);
+  background-attachment: fixed;
+  color: var(--ink);
   font-family: var(--f-util); -webkit-font-smoothing: antialiased;
 
   &.home { --f-name: var(--font-nameplate), Georgia, serif; --name-weight: 700; }
@@ -39,7 +47,7 @@ body:has(.se) { background: #211e1a; }
   & a { color: inherit; text-decoration: none; }
   & a:focus-visible, & input:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 
-  .edition { max-width: 1180px; margin: 0 auto; background: var(--paper); position: relative; box-shadow: 0 0 90px -20px rgba(0, 0, 0, 0.8); }
+  .edition { max-width: 1180px; z-index: 1; margin: 0 auto; background: var(--paper); position: relative; box-shadow: 0 0 90px -20px rgba(0, 0, 0, 0.8); }
   .pad { padding-inline: clamp(18px, 3.4vw, 40px); }
 
   /* ── primitives ── */
@@ -76,6 +84,27 @@ body:has(.se) { background: #211e1a; }
   .sec-head > a:hover { color: var(--red); }
   .sec-head code { font-family: var(--f-mono); color: var(--ink); letter-spacing: 0; text-transform: none; }
   .lead + section, section + section { margin-top: 30px; }
+
+  /* ═══ THE DESK — what the paper sits on ═══
+     Hidden until the margins can hold it (1400px+). Fixed, so the page
+     scrolls over it like paper over a table. */
+  .desk { display: none; }
+  .desk-side { position: fixed; top: 0; bottom: 0; width: calc((100% - 1180px) / 2); display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 24px; padding: 26px 0; pointer-events: none; user-select: none; color: rgba(231, 223, 202, 0.17); z-index: 0; }
+  .desk-side.l { left: 0; }
+  .desk-side.r { right: 0; }
+  .desk-reg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 0.8; opacity: 0.8; }
+  .desk-vert { flex: 1; min-height: 0; writing-mode: vertical-rl; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: 0.42em; text-transform: uppercase; margin: 0; text-align: center; white-space: nowrap; }
+  .desk-side.l .desk-vert { transform: rotate(180deg); }
+  .desk-frag { display: none; width: 138px; border-top: 3px double currentColor; padding-top: 9px; }
+  .desk-frag b { display: block; font-family: var(--f-disp); font-weight: 800; font-size: 15px; line-height: 1.02; text-transform: uppercase; margin-bottom: 7px; }
+  .desk-frag span { display: block; font-family: var(--f-mono); font-size: 8.5px; line-height: 1.6; letter-spacing: 0.12em; text-transform: uppercase; }
+  .desk-frag span.big { font-family: var(--f-disp); font-weight: 900; font-size: 21px; letter-spacing: 0; text-transform: none; margin-bottom: 4px; }
+  .desk-frag hr { border: 0; border-top: 1px solid currentColor; margin: 10px 0; }
+  .desk-frag i { font-family: var(--f-body); font-size: 12.5px; line-height: 1.35; }
+  .desk-ticker { position: absolute; top: 0; bottom: 0; right: 14px; width: 14px; overflow: hidden; color: rgba(231, 223, 202, 0.08); -webkit-mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent); mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent); }
+  .desk-ticker p { writing-mode: vertical-rl; margin: 0; font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.3em; white-space: nowrap; animation: se-desk 160s linear infinite; }
+  @media (min-width: 1400px) { .desk { display: block; } }
+  @media (min-width: 1580px) { .desk-frag { display: block; } .desk-side { justify-content: flex-start; } .desk-vert { margin-top: 12px; } .desk-side .desk-reg:last-child { margin-top: auto; } }
 
   /* ═══ MASTHEAD ═══ */
   .masthead-se { padding-top: 20px; }
