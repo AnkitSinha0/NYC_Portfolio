@@ -11,7 +11,7 @@ import { getActivity } from "@/lib/activity";
 import { getContests } from "@/lib/contests";
 import { getLanguageMarket } from "@/lib/languages";
 import { marketSentiment } from "@/lib/sentiment";
-import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural } from "@/lib/stats";
+import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural, trend, type Trend } from "@/lib/stats";
 import "@/styles/exchange.css";
 import { deskFor } from "@/lib/desk";
 
@@ -26,13 +26,6 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 type Tick = [string, string, "up" | "dn" | "fl", string];
-
-/** ▲ when the last 30 days beat the 30 before, ▼ when they fell short. */
-function trend(now: number, before: number): ["up" | "dn" | "fl", string] {
-  if (now > before) return ["up", "▲"];
-  if (now < before) return ["dn", "▼"];
-  return ["fl", "—"];
-}
 
 /** Weekly volume as chart geometry inside the 520×190 plot: x 40→510, y 155 (zero) → 20. */
 function volumeChart(weekly: number[]) {
@@ -62,18 +55,20 @@ export default async function MarketsPage() {
   const { lc, cf } = s;
   const contest = lc.contest;
 
-  const [subCls, subArrow] = trend(lc.sub30, lc.subPrev30);
-  const [actCls, actArrow] = trend(lc.act30, lc.actPrev30);
+  const subTrend = trend(lc.sub30, lc.subPrev30);
+  const actTrend = trend(lc.act30, lc.actPrev30);
+  const tick = (t: Trend) => ({ up: "up", down: "dn", flat: "fl" } as const)[t.dir];
+  const note = (t: Trend) => ({ up: "ok", down: "no", flat: "f" })[t.dir];
   const cfMove = cf.lastChange ?? 0;
   const ticker: Tick[] = [
     ["LeetCode", num(lc.solved), lc.sub7 > 0 ? "up" : "fl", lc.sub7 > 0 ? "▲" : "—"],
     ["Streak", `${lc.currentStreak} D`, lc.currentStreak > 0 ? "up" : "dn", lc.currentStreak > 0 ? "▲" : "▼"],
-    ["Submissions", num(lc.sub365), subCls, subArrow],
+    ["Submissions", num(lc.sub365), tick(subTrend), subTrend.label],
     ["Codeforces", num(cf.rating), cfMove > 0 ? "up" : cfMove < 0 ? "dn" : "fl", cfMove > 0 ? "▲" : cfMove < 0 ? "▼" : "—"],
     ["Easy", num(lc.easy), "fl", "·"],
     ["Medium", num(lc.medium), "fl", "·"],
     ["Hard", num(lc.hard), "fl", "·"],
-    ["Active Days", num(lc.act365), actCls, actArrow],
+    ["Active Days", num(lc.act365), tick(actTrend), actTrend.label],
     ["Contests", num(cf.rounds + (contest?.attended ?? 0)), "fl", "—"],
     ["Procrastination", "−15%", "dn", "▼"],
     ["Coffee", "+25%", "up", "▲"],
@@ -235,14 +230,14 @@ export default async function MarketsPage() {
               <table className="mini">
                 <thead><tr><th>Metric</th><th className="r">Value</th><th className="r">Note</th></tr></thead>
                 <tbody>
-                  <tr><td>Submissions</td><td className="r">{num(lc.sub365)}</td><td className={`r ${subCls === "dn" ? "no" : "ok"}`}>{subArrow}</td></tr>
-                  <tr><td>Active days</td><td className="r">{lc.act365}</td><td className={`r ${actCls === "dn" ? "no" : "ok"}`}>{actArrow}</td></tr>
+                  <tr><td>Submissions</td><td className="r">{num(lc.sub365)}</td><td className={`r ${note(subTrend)}`}>{subTrend.label}</td></tr>
+                  <tr><td>Active days</td><td className="r">{lc.act365}</td><td className={`r ${note(actTrend)}`}>{actTrend.label}</td></tr>
                   <tr><td>Longest streak</td><td className="r">{lc.maxStreak}</td><td className="r f">best</td></tr>
                   <tr><td>Current streak</td><td className="r">{lc.currentStreak}</td><td className="r f">live</td></tr>
                   <tr><td>Hard solved</td><td className="r">{lc.hard}</td><td className="r f">of {num(lc.totals.hard)}</td></tr>
                 </tbody>
               </table>
-              <p className="cut-cap">Arrows compare the last 30 days with the 30 before.</p>
+              <p className="cut-cap">Notes compare the last 30 completed days with the 30 before; moves under 10% read as steady.</p>
               <a className="view" href={LEETCODE_URL} target="_blank" rel="noopener noreferrer">
                 View Profile ↗
               </a>

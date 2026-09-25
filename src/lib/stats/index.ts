@@ -53,16 +53,19 @@ function titleCase(s: string) {
 
 function derive(lc: LeetCodeRaw, cf: CodeforcesRaw, asOf: string, isFallback: boolean) {
   const today = asOf;
+  // Comparison windows end at the last *completed* day unless today already
+  // has activity — an unfinished day must not count as a missed one.
+  const winEnd = (lc.calendar[today] ?? 0) > 0 ? today : addDays(today, -1);
 
   // ── LeetCode windows ──
   const win = {
-    sub7: sumWindow(lc.calendar, today, 7),
-    sub30: sumWindow(lc.calendar, today, 30),
-    subPrev30: sumWindow(lc.calendar, addDays(today, -30), 30),
+    sub7: sumWindow(lc.calendar, winEnd, 7),
+    sub30: sumWindow(lc.calendar, winEnd, 30),
+    subPrev30: sumWindow(lc.calendar, addDays(winEnd, -30), 30),
     sub365: sumWindow(lc.calendar, today, 365),
-    act7: activeWindow(lc.calendar, today, 7),
-    act30: activeWindow(lc.calendar, today, 30),
-    actPrev30: activeWindow(lc.calendar, addDays(today, -30), 30),
+    act7: activeWindow(lc.calendar, winEnd, 7),
+    act30: activeWindow(lc.calendar, winEnd, 30),
+    actPrev30: activeWindow(lc.calendar, addDays(winEnd, -30), 30),
     act365: activeWindow(lc.calendar, today, 365),
   };
 
@@ -177,6 +180,23 @@ export function delta(n: number): { text: string; cls: "u" | "d" | "f" } {
   if (n > 0) return { text: `▲ ${num(n)}`, cls: "u" };
   if (n < 0) return { text: `▼ ${num(-n)}`, cls: "d" };
   return { text: "—", cls: "f" };
+}
+
+/** Changes smaller than this read as steady, not as a move. */
+const DEAD_BAND = 0.1;
+
+export type Trend = { dir: "up" | "down" | "flat"; arrow: "▲" | "▼" | "—"; label: string };
+
+/**
+ * One window against the one before it. Moves under ±10% are "steady";
+ * anything bigger carries its size, so an arrow never overstates a blip.
+ */
+export function trend(now: number, before: number): Trend {
+  if (before === 0) return now > 0 ? { dir: "up", arrow: "▲", label: "▲ new" } : { dir: "flat", arrow: "—", label: "— steady" };
+  const change = (now - before) / before;
+  const pct = Math.round(Math.abs(change) * 100);
+  if (Math.abs(change) < DEAD_BAND) return { dir: "flat", arrow: "—", label: "— steady" };
+  return change > 0 ? { dir: "up", arrow: "▲", label: `▲ ${pct}%` } : { dir: "down", arrow: "▼", label: `▼ ${pct}%` };
 }
 
 export const plural = (n: number, one: string, many = `${one}s`) => `${num(n)} ${n === 1 ? one : many}`;
