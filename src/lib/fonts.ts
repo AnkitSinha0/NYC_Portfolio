@@ -1,5 +1,5 @@
 import {
-  UnifrakturMaguntia,
+  Old_Standard_TT,
   Playfair_Display,
   Source_Serif_4,
   Libre_Franklin,
@@ -8,9 +8,10 @@ import {
   Caveat,
 } from "next/font/google";
 
-// Nameplate — the wordmark only. Never body text.
-export const nameplate = UnifrakturMaguntia({
-  weight: "400",
+// Nameplate — the wordmark only. Never body text. A 19th-century
+// newspaper face: reads as a masthead, reads as a name.
+export const nameplate = Old_Standard_TT({
+  weight: "700",
   subsets: ["latin"],
   variable: "--font-nameplate",
   display: "swap",
