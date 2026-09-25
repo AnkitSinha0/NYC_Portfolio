@@ -7,6 +7,7 @@ import { BlueprintFragment, HashVaultInterface, KonnectInterface } from "@/compo
 import { TechIcon } from "@/components/edition/TechIcon";
 import { Terminal } from "@/components/edition/Terminal";
 import { HOBBIES, LINKS, PROJECTS, REPORTS, STACK } from "@/lib/content";
+import { deskFor } from "@/lib/desk";
 import { getStats, num } from "@/lib/stats";
 import "@/styles/edition.css";
 
@@ -32,7 +33,7 @@ export default async function Home() {
   const [hashvault, konnect] = PROJECTS;
 
   return (
-    <div className="se home">
+    <div className={`se home ${deskFor("/")}`}>
       <div className="edition">
         <Masthead active="/" />
 

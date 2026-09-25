@@ -1,13 +1,12 @@
 /**
  * Which desk each page sits on. Five desks over fifteen pages, dealt
  * by hand so each desk appears three times and neighbouring pages
- * (a section and its articles) rarely share one. The front page keeps
- * the dark grain.
+ * (a section and its articles) rarely share one.
  */
 export type Desk = "" | "desk-navy" | "desk-bigben" | "desk-collage" | "desk-wall";
 
 const DESKS: Record<string, Desk> = {
-  "/": "",
+  "/": "desk-bigben",
   "/markets": "desk-collage",
   "/work": "desk-wall",
   "/work/hashvault": "desk-bigben",
@@ -17,7 +16,7 @@ const DESKS: Record<string, Desk> = {
   "/engineering/message-driven-chat": "desk-collage",
   "/engineering/token-rotation": "desk-wall",
   "/engineering/payment-verification": "desk-bigben",
-  "/writing": "desk-bigben",
+  "/writing": "",
   "/profile": "",
   "/photography": "desk-navy",
   "/drawing": "desk-collage",
