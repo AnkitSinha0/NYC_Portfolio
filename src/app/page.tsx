@@ -6,7 +6,7 @@ import { Masthead } from "@/components/edition/Masthead";
 import { BlueprintFragment, HashVaultInterface, KonnectInterface } from "@/components/edition/Plates";
 import { TechIcon } from "@/components/edition/TechIcon";
 import { Terminal } from "@/components/edition/Terminal";
-import { HOBBIES, LINKS, PROJECTS, REPORTS, STACK } from "@/lib/content";
+import { HOBBIES, HOME_SCENES, LINKS, PROJECTS, REPORTS, STACK } from "@/lib/content";
 import { deskFor } from "@/lib/desk";
 import { getStats, num } from "@/lib/stats";
 import "@/styles/edition.css";
@@ -35,10 +35,10 @@ export default async function Home() {
   return (
     <div className={`se home ${deskFor("/")}`}>
       <div className="edition">
-        <Masthead active="/" />
+        <Masthead active="/" scenes={HOME_SCENES} />
 
         {/* ═══════ THE LEAD ═══════ */}
-        <section className="pad lead" aria-labelledby="lead-hed">
+        <section className="pad lead" id="lead" aria-labelledby="lead-hed">
           <div className="lead-main">
             <p className="kicker red">The Lead · Backend Engineering</p>
             <h1 id="lead-hed" className="lead-hed">
@@ -82,7 +82,7 @@ export default async function Home() {
         </section>
 
         {/* ═══════ TECHNICAL DESK ═══════ */}
-        <section className="pad desk" aria-labelledby="desk-hed">
+        <section className="pad desk" id="desk" aria-labelledby="desk-hed">
           <div className="sec-head">
             <h2 id="desk-hed">Technical Desk</h2>
             <span>Filed under: Stack · Tools in daily use</span>
@@ -106,7 +106,7 @@ export default async function Home() {
         </section>
 
         {/* ═══════ CURRENTLY BUILDING ═══════ */}
-        <section className="pad building" aria-labelledby="building-hed">
+        <section className="pad building" id="building" aria-labelledby="building-hed">
           <div className="sec-head">
             <h2 id="building-hed">Currently Building</h2>
             <span className="tag green">In development</span>
@@ -126,7 +126,7 @@ export default async function Home() {
         </section>
 
         {/* ═══════ SELECTED WORK ═══════ */}
-        <section className="pad work" aria-labelledby="work-hed">
+        <section className="pad work" id="work" aria-labelledby="work-hed">
           <div className="sec-head">
             <h2 id="work-hed">Selected Work</h2>
             <Link href="/work">All work →</Link>
@@ -178,7 +178,7 @@ export default async function Home() {
         </section>
 
         {/* ═══════ ENGINEERING DESK ═══════ */}
-        <section className="pad eng" aria-labelledby="eng-hed">
+        <section className="pad eng" id="eng" aria-labelledby="eng-hed">
           <div className="sec-head">
             <h2 id="eng-hed">Engineering Desk</h2>
             <span>How Ankit thinks about systems</span>
@@ -207,7 +207,7 @@ export default async function Home() {
         </section>
 
         {/* ═══════ CODING EXCHANGE ═══════ */}
-        <section className="pad exch" aria-labelledby="exch-hed">
+        <section className="pad exch" id="exch" aria-labelledby="exch-hed">
           <div className="sec-head">
             <h2 id="exch-hed">Coding Exchange</h2>
             <span className="meta-mono">
@@ -251,7 +251,7 @@ export default async function Home() {
         </section>
 
         {/* ═══════ BEYOND THE STACK ═══════ */}
-        <section className="beyond" aria-labelledby="beyond-hed">
+        <section className="beyond" id="beyond" aria-labelledby="beyond-hed">
           <div className="pad">
             <div className="beyond-rule" />
             <p className="kicker">Beyond the Stack</p>
@@ -273,10 +273,10 @@ export default async function Home() {
         </section>
 
         {/* ═══════ THE TERMINAL ═══════ */}
-        <section className="pad terminal-sec" aria-labelledby="term-hed">
+        <section className="pad terminal-sec" id="terminal" aria-labelledby="term-hed">
           <div className="sec-head">
             <h2 id="term-hed">The Terminal</h2>
-            <span>Type <code>help</code> · ↑ history · Tab completes</span>
+            <span>Click in and type <code>help</code> · ↑ history · Tab completes</span>
           </div>
           <Terminal
             stats={{

@@ -106,6 +106,10 @@ export type Project = {
   reliability: string[];
   lessons: string[];
   report?: string; // engineering report slug
+  /** Real planes of the system, for the terminal's spec sheet. */
+  planes?: [string, string][];
+  /** The project's own phase plan — progress is counted from this, never estimated. */
+  roadmap?: { phase: string; done: boolean }[];
 };
 
 export const PROJECTS: Project[] = [
@@ -155,6 +159,35 @@ export const PROJECTS: Project[] = [
       "Keeping the server off the data plane changes every other decision — quotas, confirmation, and failure handling all move to the edges of the upload.",
     ],
     report: "content-addressable-storage",
+    planes: [
+      ["Control plane", "Go / Gin / PostgreSQL / Redis"],
+      ["Data plane", "S3 / presigned URLs"],
+      ["Messaging", "RabbitMQ"],
+      ["Infrastructure", "Docker / Terraform"],
+    ],
+    // Mirrors the phase plan in the HashVault repository.
+    roadmap: [
+      { phase: "Foundation", done: true },
+      { phase: "Models & repositories", done: true },
+      { phase: "Auth (JWT + OAuth)", done: true },
+      { phase: "Folders", done: true },
+      { phase: "File upload (S3 / MinIO)", done: true },
+      { phase: "Deduplication", done: true },
+      { phase: "Test suite", done: false },
+      { phase: "Multipart / resumable upload", done: false },
+      { phase: "Adaptive chunking", done: false },
+      { phase: "File sharing", done: false },
+      { phase: "Email worker", done: false },
+      { phase: "Rate limiting", done: false },
+      { phase: "Audit log", done: false },
+      { phase: "Observability", done: false },
+      { phase: "Docker + CI/CD", done: false },
+      { phase: "Terraform + AWS", done: false },
+      { phase: "go-migrate", done: false },
+      { phase: "Content-defined chunking", done: false },
+      { phase: "Architecture document", done: false },
+      { phase: "Performance numbers", done: false },
+    ],
   },
   {
     slug: "konnect",
@@ -200,6 +233,12 @@ export const PROJECTS: Project[] = [
       "Moderation accuracy came less from the model than from the aggregation around it.",
     ],
     report: "message-driven-chat",
+    planes: [
+      ["Gateway", "Socket.IO / Traefik"],
+      ["Services", "Node.js / Express / MongoDB"],
+      ["Messaging", "RabbitMQ / Kafka"],
+      ["Moderation", "Python / RoBERTa / Redis"],
+    ],
   },
 ];
 
@@ -390,3 +429,73 @@ export const HOBBIES = {
     plates: [] as Plate[],
   },
 } as const;
+
+// ───────────────────────── the desk, scene by scene ─────────────────────────
+
+/**
+ * What the front page's margins say while each section is being read.
+ * `id` is the section's element id on the home page.
+ */
+export type Scene = {
+  id: string;
+  left: { title: string; line: string; quote?: string };
+  right: { title: string; big?: string; line: string; foot: string };
+  vert: string;
+};
+
+export const HOME_SCENES: Scene[] = [
+  {
+    id: "lead",
+    left: { title: "Engineering Desk", line: "Systems · Storage · Cloud", quote: "Build it. Break it. Understand it." },
+    right: { title: "Currently Building", big: "HashVault", line: "Go · PostgreSQL · Redis · RabbitMQ · S3", foot: "Vol. 01 · 2026" },
+    vert: "Vol. 01 · The Front Page · Backend Engineering",
+  },
+  {
+    id: "desk",
+    left: { title: "Infrastructure Report", line: "Go · K8s · AWS", quote: "Tools in daily use." },
+    right: { title: "The Index", big: "6 desks", line: "Languages · Backend · Data · Messaging · Cloud · Frontend", foot: "Filed under: Stack" },
+    vert: "Vol. 01 · Technical Desk · Tools in Daily Use",
+  },
+  {
+    id: "building",
+    left: { title: "Construction Notes", line: "Phase 4b shipped · Deduplication", quote: "Store the same bytes once." },
+    right: { title: "Plate I", big: "HV-01", line: "Control plane · Data plane", foot: "Drawn by A. Sinha" },
+    vert: "Vol. 01 · Currently Building · HashVault",
+  },
+  {
+    id: "work",
+    left: { title: "Feature Pages", line: "Konnect · Denthinkers", quote: "What has been built." },
+    right: { title: "Dispatch", big: "₹1.5L+", line: "Verified on cryptographic proof", foot: "Nov 2025 – Apr 2026" },
+    vert: "Vol. 01 · Selected Work · Case Studies",
+  },
+  {
+    id: "eng",
+    left: { title: "Technical Reports", line: "001 — 004", quote: "How the systems are thought through." },
+    right: { title: "Blueprint Room", big: "Rev 1", line: "Storage · Messaging · Security", foot: "Engineering Desk" },
+    vert: "Vol. 01 · Engineering Desk · Technical Reports",
+  },
+  {
+    id: "exch",
+    left: { title: "Market Hours", line: "LeetCode · Codeforces", quote: "The market rewards those who show up." },
+    right: { title: "The Exchange", big: "Live", line: "Refreshed hourly", foot: "Close of trading" },
+    vert: "Vol. 01 · Coding Exchange · Market Report",
+  },
+  {
+    id: "beyond",
+    left: { title: "Late Edition", line: "Beyond the Stack", quote: "The person behind the systems." },
+    right: { title: "Arts & Leisure", big: "Off duty", line: "Photography · Drawing · Gaming", foot: "Weekend section" },
+    vert: "Vol. 01 · Beyond the Stack · Arts & Leisure",
+  },
+  {
+    id: "terminal",
+    left: { title: "System Access", line: "ankit@ankitsin", quote: "Type help." },
+    right: { title: "Session Open", big: "tty1", line: "↑ history · Tab completes", foot: "zsh · 80×24" },
+    vert: "Vol. 01 · The Terminal · System Access",
+  },
+  {
+    id: "contact",
+    left: { title: "The Closing Edition", line: "Get in touch", quote: "Let's build something that survives production." },
+    right: { title: "Printed at Patna", big: "Issue 001", line: "ankitsin.in", foot: "End of edition" },
+    vert: "Vol. 01 · The Closing Edition · Contact",
+  },
+];

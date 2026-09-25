@@ -33,6 +33,11 @@
 @media (min-width: 1580px) { .desk-frag { display: block; } .desk-side { justify-content: flex-start; } .desk-vert { margin-top: 12px; } .desk-side .desk-reg:last-child { margin-top: auto; } }
 
 
+/* scenes (front page): margin text cross-fades as sections change */
+.desk-scene { transition: opacity 0.38s ease, transform 0.38s ease; }
+.desk-scene.out { opacity: 0; transform: translateY(6px); }
+.desk-side.l .desk-vert.desk-scene.out { transform: rotate(180deg) translateY(-6px); }
+
 .desk-navy .desk-side, .desk-bigben .desk-side, .desk-collage .desk-side, .desk-wall .desk-side { background-repeat: no-repeat; background-size: cover; }
 .desk-navy .desk-side { background-image: linear-gradient(rgba(10, 12, 24, 0.25), rgba(10, 12, 24, 0.25)), url("/desk/layout-navy.jpg"); color: rgba(214, 222, 240, 0.2); }
 .desk-navy .desk-side.l { background-position: right center; box-shadow: inset -40px 0 60px -20px rgba(0, 0, 0, 0.55); }
