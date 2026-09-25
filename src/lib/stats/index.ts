@@ -122,6 +122,8 @@ function derive(lc: LeetCodeRaw, cf: CodeforcesRaw, asOf: string, isFallback: bo
     maxRatingMonth: peakRound ? `${monthOf(peakRound.day)} ${peakRound.day.slice(0, 4)}` : "—",
     rank: titleCase(cf.rank ?? "unrated"),
     nextRank: CF_RANKS[bandIndex + 1]?.[0] ?? null,
+    rankFloor: CF_RANKS[bandIndex][1],
+    nextRankAt: CF_RANKS[bandIndex + 1]?.[1] ?? null,
     rounds,
     bestRank: rounds ? Math.min(...cf.history.map((h) => h.rank)) : null,
     lastChange: rounds ? cf.history[rounds - 1].newRating - cf.history[rounds - 1].oldRating : null,

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Colophon } from "@/components/edition/Colophon";
+import { ExchangeCard } from "@/components/edition/ExchangeCard";
 import { HobbyArt } from "@/components/edition/HobbyArt";
 import { Masthead } from "@/components/edition/Masthead";
 import { BlueprintFragment, HashVaultInterface, KonnectInterface } from "@/components/edition/Plates";
@@ -8,24 +9,11 @@ import { TechIcon } from "@/components/edition/TechIcon";
 import { Terminal } from "@/components/edition/Terminal";
 import { HOBBIES, HOME_SCENES, LINKS, PROJECTS, REPORTS, STACK } from "@/lib/content";
 import { deskFor } from "@/lib/desk";
-import { getStats, num } from "@/lib/stats";
+import { getStats } from "@/lib/stats";
 import "@/styles/edition.css";
 
 // Keep in step with REVALIDATE in src/lib/stats/config.ts (must be a literal here).
 export const revalidate = 3600;
-
-/** A tiny printed sparkline of weekly practice volume. */
-function Spark({ values }: { values: number[] }) {
-  const recent = values.slice(-16);
-  const max = Math.max(1, ...recent);
-  const pts = recent.map((v, i) => `${(i * 200) / (recent.length - 1)},${40 - (v / max) * 34}`).join(" ");
-  return (
-    <svg viewBox="0 0 200 44" className="spark-se" role="img" aria-label="Weekly submissions, last sixteen weeks">
-      <polyline points={`0,40 ${pts} 200,40`} className="area" />
-      <polyline points={pts} className="line" />
-    </svg>
-  );
-}
 
 export default async function Home() {
   const stats = await getStats();
@@ -206,48 +194,9 @@ export default async function Home() {
           <Link className="more" href="/engineering">Read the Engineering Desk →</Link>
         </section>
 
-        {/* ═══════ CODING EXCHANGE ═══════ */}
+        {/* ═══════ CODING EXCHANGE — one card, one invitation ═══════ */}
         <section className="pad exch" id="exch" aria-labelledby="exch-hed">
-          <div className="sec-head">
-            <h2 id="exch-hed">Coding Exchange</h2>
-            <span className="meta-mono">
-              {stats.isFallback ? "Last known" : "Live"} · {stats.asOfLabel}
-            </span>
-          </div>
-          <div className="exch-grid">
-            <div className="quote">
-              <p className="sym">LeetCode</p>
-              <b>{lc.contest ? num(lc.contest.rating) : num(lc.solved)}</b>
-              <p>
-                {lc.contest ? `contest rating · top ${lc.contest.topPercent}%` : "problems solved"}
-                <br />
-                {lc.solved} problems solved · {lc.easy}/{lc.medium}/{lc.hard}
-              </p>
-            </div>
-            <div className="quote">
-              <p className="sym">Codeforces</p>
-              <b>{num(cf.rating)}</b>
-              <p>
-                {cf.rank} · {cf.rounds} rated {cf.rounds === 1 ? "round" : "rounds"}
-                <br />
-                {cf.lastChange ? `${cf.lastChange > 0 ? "▲ +" : "▼ "}${cf.lastChange} last round` : "—"}
-              </p>
-            </div>
-            <div className="quote">
-              <p className="sym">Streak</p>
-              <b>{lc.currentStreak}</b>
-              <p>
-                days running · best {lc.maxStreak}
-                <br />
-                {lc.act30} active of the last 30
-              </p>
-            </div>
-            <div className="spark-box">
-              <p className="sym">Weekly submissions</p>
-              <Spark values={stats.weekly} />
-            </div>
-          </div>
-          <Link className="more" href="/markets">Open the full exchange →</Link>
+          <ExchangeCard stats={stats} />
         </section>
 
         {/* ═══════ BEYOND THE STACK ═══════ */}
