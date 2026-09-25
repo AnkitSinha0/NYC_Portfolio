@@ -39,8 +39,9 @@ body:has(.cx) { background: #17130f; }
 
   /* ── SHEET ── */
   .stage { display: block; padding: 26px clamp(14px, 2.4vw, 34px) 46px; }
+  @media (min-width: 1240px) { .stage { padding-inline: 0; } }
   .sheet {
-    background: var(--paper); position: relative; margin: 0 auto;
+    background: var(--paper); position: relative; max-width: 1180px; margin: 0 auto; z-index: 1;
     box-shadow: 0 26px 70px -24px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(0, 0, 0, 0.35);
     padding: clamp(16px, 2vw, 26px) clamp(16px, 2.2vw, 30px) clamp(20px, 2.4vw, 32px);
   }

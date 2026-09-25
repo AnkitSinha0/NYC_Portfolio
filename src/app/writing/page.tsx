@@ -4,6 +4,7 @@ import { Colophon } from "@/components/edition/Colophon";
 import { Masthead } from "@/components/edition/Masthead";
 import { REPORTS } from "@/lib/content";
 import "@/styles/edition.css";
+import { deskFor } from "@/lib/desk";
 
 export const metadata: Metadata = {
   title: "Writing",
@@ -15,7 +16,7 @@ export const revalidate = 3600;
 
 export default function Writing() {
   return (
-    <div className="se">
+    <div className={`se ${deskFor("/writing")}`}>
       <div className="edition">
         <Masthead active="/writing" desk="Writing · The Archive" />
         <section className="pad page-open">

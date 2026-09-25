@@ -6,6 +6,7 @@ import { Masthead } from "@/components/edition/Masthead";
 import { HashVaultBlueprint, HashVaultInterface, KonnectInterface, KonnectPlate } from "@/components/edition/Plates";
 import { PROJECTS, REPORTS } from "@/lib/content";
 import "@/styles/edition.css";
+import { deskFor } from "@/lib/desk";
 
 export const revalidate = 3600;
 
@@ -28,7 +29,7 @@ export default async function CaseStudy({ params }: PageProps<"/work/[slug]">) {
   const hv = p.slug === "hashvault";
 
   return (
-    <div className="se">
+    <div className={`se ${deskFor(`/work/${p.slug}`)}`}>
       <div className="edition">
         <Masthead active="/work" desk={`Case Study ${p.no} · ${p.name}`} />
 

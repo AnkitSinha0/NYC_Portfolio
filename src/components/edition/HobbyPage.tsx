@@ -4,6 +4,7 @@ import { Colophon } from "@/components/edition/Colophon";
 import { HobbyArt } from "@/components/edition/HobbyArt";
 import { Masthead } from "@/components/edition/Masthead";
 import { HOBBIES } from "@/lib/content";
+import { deskFor } from "@/lib/desk";
 
 const INTRO = {
   photography: {
@@ -30,7 +31,7 @@ export function HobbyPage({ kind }: { kind: keyof typeof HOBBIES }) {
   const plates = h.plates;
 
   return (
-    <div className={`se hobby-page ${kind}`}>
+    <div className={`se hobby-page ${kind} ${deskFor(`/${kind}`)}`}>
       <div className="edition">
         <Masthead active="/" desk={`Beyond the Stack · ${h.title}`} />
         <section className="pad page-open">

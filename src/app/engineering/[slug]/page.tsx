@@ -6,6 +6,7 @@ import { Masthead } from "@/components/edition/Masthead";
 import { ReportDiagram } from "@/components/edition/Plates";
 import { PROJECTS, REPORTS } from "@/lib/content";
 import "@/styles/edition.css";
+import { deskFor } from "@/lib/desk";
 
 export const revalidate = 3600;
 
@@ -29,7 +30,7 @@ export default async function Report({ params }: PageProps<"/engineering/[slug]"
   const project = PROJECTS.find((p) => p.report === r.slug);
 
   return (
-    <div className="se">
+    <div className={`se ${deskFor(`/engineering/${r.slug}`)}`}>
       <div className="edition">
         <Masthead active="/engineering" desk={`Technical Report ${r.no}`} />
 

@@ -5,6 +5,7 @@ import { Masthead } from "@/components/edition/Masthead";
 import { ReportDiagram } from "@/components/edition/Plates";
 import { REPORTS } from "@/lib/content";
 import "@/styles/edition.css";
+import { deskFor } from "@/lib/desk";
 
 export const metadata: Metadata = {
   title: "Engineering Desk",
@@ -16,7 +17,7 @@ export const revalidate = 3600;
 
 export default function EngineeringDesk() {
   return (
-    <div className="se">
+    <div className={`se ${deskFor("/engineering")}`}>
       <div className="edition">
         <Masthead active="/engineering" desk="The Engineering Desk" />
         <section className="pad page-open">

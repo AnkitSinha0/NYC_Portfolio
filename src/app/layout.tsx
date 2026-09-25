@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fontVariables } from "@/lib/fonts";
 import { SITE_URL, personJsonLd } from "@/lib/site";
 import "./globals.css";
+import "@/styles/desk.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

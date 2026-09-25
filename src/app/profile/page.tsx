@@ -5,6 +5,7 @@ import { Masthead } from "@/components/edition/Masthead";
 import { TechIcon } from "@/components/edition/TechIcon";
 import { LINKS, STACK } from "@/lib/content";
 import "@/styles/edition.css";
+import { deskFor } from "@/lib/desk";
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -23,7 +24,7 @@ const EDUCATION: [string, string, string][] = [
 
 export default function Profile() {
   return (
-    <div className="se">
+    <div className={`se ${deskFor("/profile")}`}>
       <div className="edition">
         <Masthead active="/profile" desk="Profile" />
 

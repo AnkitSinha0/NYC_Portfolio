@@ -11,7 +11,6 @@ body:has(.se) { background: #1d1a16; }
 @keyframes se-rise { from { opacity: 0.15; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes se-flow { to { stroke-dashoffset: -28; } }
 @keyframes se-blink { 50% { opacity: 0.2; } }
-@keyframes se-desk { to { transform: translateY(-50%); } }
 
 .se {
   --desk: #211e1a;
@@ -84,27 +83,6 @@ body:has(.se) { background: #1d1a16; }
   .sec-head > a:hover { color: var(--red); }
   .sec-head code { font-family: var(--f-mono); color: var(--ink); letter-spacing: 0; text-transform: none; }
   .lead + section, section + section { margin-top: 30px; }
-
-  /* ═══ THE DESK — what the paper sits on ═══
-     Hidden until the margins can hold it (1400px+). Fixed, so the page
-     scrolls over it like paper over a table. */
-  .desk { display: none; }
-  .desk-side { position: fixed; top: 0; bottom: 0; width: calc((100% - 1180px) / 2); display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 24px; padding: 26px 0; pointer-events: none; user-select: none; color: rgba(231, 223, 202, 0.17); z-index: 0; }
-  .desk-side.l { left: 0; }
-  .desk-side.r { right: 0; }
-  .desk-reg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 0.8; opacity: 0.8; }
-  .desk-vert { flex: 1; min-height: 0; writing-mode: vertical-rl; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: 0.42em; text-transform: uppercase; margin: 0; text-align: center; white-space: nowrap; }
-  .desk-side.l .desk-vert { transform: rotate(180deg); }
-  .desk-frag { display: none; width: 138px; border-top: 3px double currentColor; padding-top: 9px; }
-  .desk-frag b { display: block; font-family: var(--f-disp); font-weight: 800; font-size: 15px; line-height: 1.02; text-transform: uppercase; margin-bottom: 7px; }
-  .desk-frag span { display: block; font-family: var(--f-mono); font-size: 8.5px; line-height: 1.6; letter-spacing: 0.12em; text-transform: uppercase; }
-  .desk-frag span.big { font-family: var(--f-disp); font-weight: 900; font-size: 21px; letter-spacing: 0; text-transform: none; margin-bottom: 4px; }
-  .desk-frag hr { border: 0; border-top: 1px solid currentColor; margin: 10px 0; }
-  .desk-frag i { font-family: var(--f-body); font-size: 12.5px; line-height: 1.35; }
-  .desk-ticker { position: absolute; top: 0; bottom: 0; right: 14px; width: 14px; overflow: hidden; color: rgba(231, 223, 202, 0.08); -webkit-mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent); mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent); }
-  .desk-ticker p { writing-mode: vertical-rl; margin: 0; font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.3em; white-space: nowrap; animation: se-desk 160s linear infinite; }
-  @media (min-width: 1400px) { .desk { display: block; } }
-  @media (min-width: 1580px) { .desk-frag { display: block; } .desk-side { justify-content: flex-start; } .desk-vert { margin-top: 12px; } .desk-side .desk-reg:last-child { margin-top: auto; } }
 
   /* ═══ MASTHEAD ═══ */
   .masthead-se { padding-top: 20px; }

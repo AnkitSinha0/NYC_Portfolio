@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ActivityFloor } from "@/components/ActivityFloor";
 import { ContestCalendar } from "@/components/ContestCalendar";
+import { DeskMargins } from "@/components/edition/DeskMargins";
 import { ExchangeMotion } from "@/components/ExchangeMotion";
 import { LanguageMarket } from "@/components/LanguageMarket";
 import { MarketSentiment } from "@/components/MarketSentiment";
@@ -12,6 +13,7 @@ import { getLanguageMarket } from "@/lib/languages";
 import { marketSentiment } from "@/lib/sentiment";
 import { CODEFORCES_URL, LEETCODE_URL, delta, getStats, num, plural } from "@/lib/stats";
 import "@/styles/exchange.css";
+import { deskFor } from "@/lib/desk";
 
 export const metadata: Metadata = {
   title: "The Coding Exchange",
@@ -93,7 +95,8 @@ export default async function MarketsPage() {
   ];
 
   return (
-    <div className="cx">
+    <div className={`cx ${deskFor("/markets")}`}>
+      <DeskMargins />
       <main className="stage">
         <div className="sheet">
           {/* masthead */}

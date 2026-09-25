@@ -1,9 +1,10 @@
 import Link from "next/link";
 import "@/styles/edition.css";
+import { deskFor } from "@/lib/desk";
 
 export default function NotFound() {
   return (
-    <div className="se">
+    <div className={`se ${deskFor("/404")}`}>
       <div className="edition">
         <div className="pad" style={{ paddingTop: 22, paddingBottom: 60 }}>
           <hr className="rule-hair" />

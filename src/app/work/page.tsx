@@ -5,6 +5,7 @@ import { Masthead } from "@/components/edition/Masthead";
 import { HashVaultInterface, KonnectInterface } from "@/components/edition/Plates";
 import { PROJECTS } from "@/lib/content";
 import "@/styles/edition.css";
+import { deskFor } from "@/lib/desk";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -16,7 +17,7 @@ export const revalidate = 3600;
 
 export default function WorkIndex() {
   return (
-    <div className="se">
+    <div className={`se ${deskFor("/work")}`}>
       <div className="edition">
         <Masthead active="/work" desk="The Work Section" />
         <section className="pad page-open">
