@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Colophon } from "@/components/edition/Colophon";
 import { ExchangeCard } from "@/components/edition/ExchangeCard";
+import { GopherRun } from "@/components/edition/GopherRun";
 import { HobbyArt } from "@/components/edition/HobbyArt";
 import { Masthead } from "@/components/edition/Masthead";
 import { BlueprintFragment, HashVaultInterface, KonnectInterface } from "@/components/edition/Plates";
@@ -24,6 +25,7 @@ export default async function Home() {
     <div className={`se home ${deskFor("/")}`}>
       <div className="edition">
         <Masthead active="/" scenes={HOME_SCENES} />
+        <GopherRun />
 
         {/* ═══════ THE LEAD ═══════ */}
         <section className="pad lead" id="lead" aria-labelledby="lead-hed">

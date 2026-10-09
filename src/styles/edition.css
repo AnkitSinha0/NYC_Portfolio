@@ -12,6 +12,7 @@ body:has(.se) { background: #1d1a16; }
 @keyframes se-flow { to { stroke-dashoffset: -28; } }
 @keyframes se-blink { 50% { opacity: 0.2; } }
 @keyframes exch-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes g-flash { from { opacity: 0.95; } to { opacity: 0; } }
 
 .se {
   --desk: #211e1a;
@@ -114,6 +115,52 @@ body:has(.se) { background: #1d1a16; }
   .facts div { display: grid; grid-template-columns: 78px 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px dotted var(--hair); }
   .facts dt { font-size: 8.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft); padding-top: 3px; }
   .facts dd { margin: 0; font-family: var(--f-body); font-size: 13px; }
+
+  /* ── the gopher (GopherRun): posed every frame from JS ── */
+  .gopher-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+  .gopher-rope { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; }
+  .gopher-rope path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .gopher-rope .r-base { stroke: #6e5028; stroke-width: 2.8; }
+  .gopher-rope .r-twist { stroke: #c79d5e; stroke-width: 1.2; stroke-dasharray: 2.5 3; }
+  .gopher-rope circle { fill: var(--ink); }
+  .gopher-flash { position: absolute; opacity: 0; background: radial-gradient(circle at 30% 45%, #fffef6 0, rgba(255, 254, 246, 0.85) 45%, rgba(255, 254, 246, 0.4) 100%); }
+  .gopher-flash.pop { animation: g-flash 0.6s ease-out; }
+  .gopher { position: absolute; left: 0; top: 0; width: 48px; height: 68.16px; transform-origin: 0 0; opacity: 0; will-change: transform, opacity; }
+  .g-art { display: block; width: 100%; height: 100%; overflow: visible; }
+  .g-fur { fill: #6ad7e5; stroke: #000; stroke-width: 2.2; }
+  .g-ear { fill: #2c7f8e; }
+  .g-skin { fill: #f6d2a2; stroke: #000; stroke-width: 1.8; }
+  .g-eye { fill: #fff; stroke: #000; stroke-width: 2.2; }
+  .g-pupils circle { fill: #000; }
+  .g-pupils .g-glint { fill: #fff; }
+  .g-nose { fill: #2b2523; stroke: #000; stroke-width: 1.4; }
+  .g-teeth { fill: #fff; stroke: #000; stroke-width: 1.6; }
+  .g-camera rect { fill: #26231f; stroke: #000; stroke-width: 1.4; }
+  .g-burst { fill: #fff6c8; stroke: var(--ochre); stroke-width: 1.2; opacity: 0; }
+  .g-click { position: absolute; left: 40px; top: -20px; font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); opacity: 0; transition: opacity 0.15s; }
+  .g-arms-up, .g-camera { display: none; }
+  .gopher[data-arms="up"] .g-arms-up, .gopher[data-arms="camera"] .g-camera { display: inline; }
+  .gopher:is([data-arms="up"], [data-arms="camera"]) :is(.g-arm-a, .g-arm-b) { display: none; }
+  .gopher[data-snap] .g-burst { animation: g-flash 0.45s ease-out; }
+  .gopher[data-snap] .g-click { opacity: 1; }
+  .g-arm-eat { display: none; }
+  .gopher[data-arms="eat"] .g-arm-eat { display: inline; }
+  .gopher[data-arms="eat"] .g-arm-b { display: none; }
+  .g-kernel { fill: #fff6dc; stroke: #9a7a2c; stroke-width: 1.2; }
+  .g-board, .g-bucket, .g-pop { position: absolute; left: 0; top: 0; transform-origin: 0 0; opacity: 0; will-change: transform, opacity; }
+  .g-board { width: 46px; height: 11px; }
+  .g-bucket { width: 60px; height: 76px; }
+  .g-board svg, .g-bucket svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .sk-deck { fill: #b8763a; stroke: #000; stroke-width: 1; }
+  .sk-wheel { fill: #f1ede2; stroke: #000; stroke-width: 0.9; }
+  .sk-truck { fill: #8b8b8b; }
+  .b-red { fill: #c4232b; }
+  .b-white { fill: #f8f2e2; }
+  .b-line { fill: none; stroke: #000; stroke-width: 1.6; stroke-linejoin: round; }
+  .b-rim { fill: #f8f2e2; stroke: #000; stroke-width: 1.4; }
+  .b-inside { fill: #3a1d10; }
+  .b-pop circle { fill: #fff6dc; stroke: #b8923e; stroke-width: 1; }
+  .g-pop { width: 8px; height: 7px; border-radius: 50% 45% 55% 40%; border: 1px solid #8a6a2a; background: radial-gradient(circle at 35% 35%, #fffaf0 0 40%, #f3dfa0 70%, #d4a23c 100%); }
 
   /* ═══ TECHNICAL DESK ═══ */
   .stack-index { border-top: 1px solid var(--ink); }
